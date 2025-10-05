@@ -4,10 +4,10 @@
 
 We release patches for security vulnerabilities. Currently supported versions:
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 1.0.x   | Yes                |
-| < 1.0   | No                 |
+| Version | Supported |
+| ------- | --------- |
+| 1.0.x   | Yes       |
+| < 1.0   | No        |
 
 ## Reporting a Vulnerability
 
@@ -20,7 +20,7 @@ We take the security of FraudGuard AI seriously. If you believe you have found a
 
 ### Please DO:
 
-1. Email us directly at: Murillo.aaron01@gmail.com
+1. Email us directly at: murillo.aaron102@gmail.com
 2. Provide detailed information including:
    - Description of the vulnerability
    - Steps to reproduce the issue
@@ -39,43 +39,50 @@ We take the security of FraudGuard AI seriously. If you believe you have found a
 ### For Deployment
 
 1. Never commit secrets to version control
+
    - Use environment variables for all sensitive data
    - Keep `.env` files out of git (already in `.gitignore`)
    - Use secrets management systems (AWS Secrets Manager, HashiCorp Vault, etc.)
 
 2. Generate strong secrets
+
    ```bash
    # Generate a secure SECRET_KEY
    python -c "import secrets; print(secrets.token_urlsafe(32))"
    ```
 
 3. Use HTTPS in production
+
    - Always use TLS/SSL for API endpoints
    - Configure proper SSL certificates
    - Enable HSTS headers
 
 4. Enable authentication
+
    - Set `REQUIRE_AUTHENTICATION=true` in production
    - Use strong JWT secrets
    - Implement proper API key management
 
 5. Configure rate limiting
+
    - Enable rate limiting to prevent abuse
    - Set appropriate limits based on your use case
    - Monitor for suspicious activity
 
 6. Database security
+
    - Use strong database passwords
    - Restrict database access to application servers only
    - Enable SSL for database connections
    - Regular backups with encryption
 
 7. Keep dependencies updated
+
    ```bash
    # Check for security vulnerabilities
    pip install safety
    safety check
-   
+
    # Update dependencies
    pip install --upgrade -r requirements.txt
    ```
@@ -83,24 +90,27 @@ We take the security of FraudGuard AI seriously. If you believe you have found a
 ### For Development
 
 1. Use separate environments
+
    - Never use production credentials in development
    - Use different SECRET_KEY for each environment
    - Isolate development databases
 
 2. Run security scans
+
    ```bash
    # Run Bandit security scanner
    make security-scan
-   
+
    # Or manually
    bandit -r . -f json -o bandit-report.json
    ```
 
 3. Pre-commit hooks
+
    ```bash
    # Install pre-commit hooks
    make install-hooks
-   
+
    # This will automatically:
    # - Check for private keys
    # - Scan for security issues
@@ -184,10 +194,10 @@ This project implements security best practices for:
 ## Contact
 
 For security concerns, please contact:
-- Security Email: [Your security email]
+
+- Security Email: murillo.aaron102@gmail.com
 - GitHub Issues: For non-security bugs only
 
 ---
 
 Last Updated: January 2024
-

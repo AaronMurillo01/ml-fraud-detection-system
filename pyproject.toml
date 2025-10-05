@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "fraud-detection-system"
 version = "1.0.0"
 description = "Production-ready real-time credit card fraud detection system"
-authors = [{name = "Fraud Detection Team", email = "team@company.com"}]
+authors = [{name = "Aaron Murillo", email = "murillo.aaron102@gmail.com"}]
 readme = "README.md"
 requires-python = ">=3.11"
 classifiers = [
@@ -127,10 +127,10 @@ training = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/AaronMurillo01/DNA_website"
-Repository = "https://github.com/AaronMurillo01/DNA_website.git"
-Documentation = "https://github.com/AaronMurillo01/DNA_website/tree/master/Desktop/Notes%20V/vs%20code/ML%20CRML/docs"
-"Bug Tracker" = "https://github.com/AaronMurillo01/DNA_website/issues"
+Homepage = "https://github.com/AaronMurillo01/ml-fraud-detection-system"
+Repository = "https://github.com/AaronMurillo01/ml-fraud-detection-system.git"
+Documentation = "https://github.com/AaronMurillo01/ml-fraud-detection-system/tree/main/docs"
+"Bug Tracker" = "https://github.com/AaronMurillo01/ml-fraud-detection-system/issues"
 
 [project.scripts]
 fraud-api = "service.api.main:main"
