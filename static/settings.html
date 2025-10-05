@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Settings - FraudGuard AI</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --primary: #2563eb;
+        --primary-dark: #1e40af;
+        --secondary: #64748b;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --info: #3b82f6;
+        --gray-50: #f8fafc;
+        --gray-100: #f1f5f9;
+        --gray-200: #e2e8f0;
+        --gray-300: #cbd5e1;
+        --gray-400: #94a3b8;
+        --gray-500: #64748b;
+        --gray-600: #475569;
+        --gray-700: #334155;
+        --gray-800: #1e293b;
+        --gray-900: #0f172a;
+        --white: #ffffff;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        --border-radius: 8px;
+        --transition: all 0.2s ease;
+      }
+
+      [data-theme="dark"] {
+        --gray-50: #0f172a;
+        --gray-100: #1e293b;
+        --gray-200: #334155;
+        --gray-300: #475569;
+        --gray-400: #64748b;
+        --gray-500: #94a3b8;
+        --gray-600: #cbd5e1;
+        --gray-700: #e2e8f0;
+        --gray-800: #f1f5f9;
+        --gray-900: #f8fafc;
+        --white: #0f172a;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background: var(--gray-50);
+        color: var(--gray-900);
+        line-height: 1.6;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+
+      .header {
+        background: var(--white);
+        padding: 1.5rem 2rem;
+        box-shadow: var(--shadow-sm);
+        margin-bottom: 2rem;
+        border-radius: var(--border-radius);
+      }
+
+      .header h1 {
+        font-size: 1.875rem;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin-bottom: 0.5rem;
+      }
+
+      .header p {
+        color: var(--gray-600);
+        font-size: 0.875rem;
+      }
+
+      .nav {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+      }
+
+      .nav-link {
+        padding: 0.75rem 1.5rem;
+        background: var(--white);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--border-radius);
+        text-decoration: none;
+        color: var(--gray-700);
+        font-weight: 500;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .nav-link:hover {
+        background: var(--gray-50);
+        border-color: var(--primary);
+        color: var(--primary);
+      }
+
+      .nav-link.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+      }
+
+      .settings-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 2rem;
+      }
+
+      .settings-card {
+        background: var(--white);
+        border-radius: var(--border-radius);
+        padding: 2rem;
+        box-shadow: var(--shadow-md);
+      }
+
+      .settings-card h2 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--gray-900);
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .settings-card h2 i {
+        color: var(--primary);
+      }
+
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      .form-group label {
+        display: block;
+        font-weight: 500;
+        color: var(--gray-700);
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+      }
+
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid var(--gray-300);
+        border-radius: var(--border-radius);
+        font-size: 0.875rem;
+        transition: var(--transition);
+        background: var(--white);
+        color: var(--gray-900);
+      }
+
+      .form-group input:focus,
+      .form-group select:focus,
+      .form-group textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      }
+
+      .form-group textarea {
+        resize: vertical;
+        min-height: 100px;
+      }
+
+      .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+      }
+
+      .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: var(--gray-300);
+        transition: 0.4s;
+        border-radius: 24px;
+      }
+
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: 0.4s;
+        border-radius: 50%;
+      }
+
+      input:checked + .slider {
+        background-color: var(--primary);
+      }
+
+      input:checked + .slider:before {
+        transform: translateX(26px);
+      }
+
+      .btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: var(--border-radius);
+        font-weight: 500;
+        cursor: pointer;
+        transition: var(--transition);
+        font-size: 0.875rem;
+      }
+
+      .btn-primary {
+        background: var(--primary);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        background: var(--primary-dark);
+      }
+
+      .btn-secondary {
+        background: var(--gray-200);
+        color: var(--gray-700);
+      }
+
+      .btn-secondary:hover {
+        background: var(--gray-300);
+      }
+
+      .btn-danger {
+        background: var(--danger);
+        color: white;
+      }
+
+      .btn-danger:hover {
+        background: #dc2626;
+      }
+
+      .button-group {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+      }
+
+      .theme-toggle {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: var(--primary);
+        color: white;
+        border: none;
+        cursor: pointer;
+        box-shadow: var(--shadow-lg);
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+      }
+
+      .theme-toggle:hover {
+        transform: scale(1.1);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1><i class="fas fa-cog"></i> Settings</h1>
+        <p>Configure your FraudGuard AI system preferences</p>
+      </div>
+
+      <nav class="nav">
+        <a href="/static/dashboard.html" class="nav-link">
+          <i class="fas fa-home"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="/static/analytics_dashboard.html" class="nav-link">
+          <i class="fas fa-chart-line"></i>
+          <span>Analytics</span>
+        </a>
+        <a href="/static/models.html" class="nav-link">
+          <i class="fas fa-brain"></i>
+          <span>Models</span>
+        </a>
+        <a href="/static/monitoring.html" class="nav-link">
+          <i class="fas fa-heartbeat"></i>
+          <span>Monitoring</span>
+        </a>
+        <a href="/static/reports.html" class="nav-link">
+          <i class="fas fa-file-alt"></i>
+          <span>Reports</span>
+        </a>
+        <a href="/static/settings.html" class="nav-link active">
+          <i class="fas fa-cog"></i>
+          <span>Settings</span>
+        </a>
+        <a href="/docs" class="nav-link">
+          <i class="fas fa-book"></i>
+          <span>API Docs</span>
+        </a>
+      </nav>
+
+      <div class="settings-grid">
+        <!-- General Settings -->
+        <div class="settings-card">
+          <h2><i class="fas fa-sliders-h"></i> General Settings</h2>
+          <div class="form-group">
+            <label>System Name</label>
+            <input type="text" value="FraudGuard AI" placeholder="Enter system name" />
+          </div>
+          <div class="form-group">
+            <label>Time Zone</label>
+            <select>
+              <option>UTC</option>
+              <option>America/New_York</option>
+              <option>America/Los_Angeles</option>
+              <option>Europe/London</option>
+              <option>Asia/Tokyo</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Language</label>
+            <select>
+              <option>English</option>
+              <option>Spanish</option>
+              <option>French</option>
+              <option>German</option>
+            </select>
+          </div>
+          <div class="button-group">
+            <button type="button" class="btn btn-primary">Save Changes</button>
+            <button type="button" class="btn btn-secondary">Reset</button>
+          </div>
+        </div>
+
+        <!-- Notification Settings -->
+        <div class="settings-card">
+          <h2><i class="fas fa-bell"></i> Notifications</h2>
+          <div class="form-group">
+            <label style="display: flex; justify-content: space-between; align-items: center;">
+              <span>Email Notifications</span>
+              <label class="toggle-switch">
+                <input type="checkbox" checked />
+                <span class="slider"></span>
+              </label>
+            </label>
+          </div>
+          <div class="form-group">
+            <label style="display: flex; justify-content: space-between; align-items: center;">
+              <span>SMS Alerts</span>
+              <label class="toggle-switch">
+                <input type="checkbox" />
+                <span class="slider"></span>
+              </label>
+            </label>
+          </div>
+          <div class="form-group">
+            <label style="display: flex; justify-content: space-between; align-items: center;">
+              <span>Push Notifications</span>
+              <label class="toggle-switch">
+                <input type="checkbox" checked />
+                <span class="slider"></span>
+              </label>
+            </label>
+          </div>
+          <div class="form-group">
+            <label>Notification Email</label>
+            <input type="email" placeholder="admin@fraudguard.ai" />
+          </div>
+          <div class="button-group">
+            <button type="button" class="btn btn-primary">Save Changes</button>
+          </div>
+        </div>
+
+        <!-- Security Settings -->
+        <div class="settings-card">
+          <h2><i class="fas fa-shield-alt"></i> Security</h2>
+          <div class="form-group">
+            <label style="display: flex; justify-content: space-between; align-items: center;">
+              <span>Two-Factor Authentication</span>
+              <label class="toggle-switch">
+                <input type="checkbox" checked />
+                <span class="slider"></span>
+              </label>
+            </label>
+          </div>
+          <div class="form-group">
+            <label style="display: flex; justify-content: space-between; align-items: center;">
+              <span>API Key Rotation</span>
+              <label class="toggle-switch">
+                <input type="checkbox" />
+                <span class="slider"></span>
+              </label>
+            </label>
+          </div>
+          <div class="form-group">
+            <label>Session Timeout (minutes)</label>
+            <input type="number" value="30" min="5" max="120" />
+          </div>
+          <div class="form-group">
+            <label>API Key</label>
+            <input type="password" value="sk_live_1234567890abcdef" readonly />
+          </div>
+          <div class="button-group">
+            <button type="button" class="btn btn-primary">Regenerate API Key</button>
+          </div>
+        </div>
+
+        <!-- Model Settings -->
+        <div class="settings-card">
+          <h2><i class="fas fa-brain"></i> Model Configuration</h2>
+          <div class="form-group">
+            <label>Default Model</label>
+            <select>
+              <option>XGBoost Classifier</option>
+              <option>Random Forest</option>
+              <option>Neural Network</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Fraud Threshold</label>
+            <input type="range" min="0" max="100" value="75" />
+            <small style="color: var(--gray-600);">Current: 75%</small>
+          </div>
+          <div class="form-group">
+            <label style="display: flex; justify-content: space-between; align-items: center;">
+              <span>Auto-Retrain Models</span>
+              <label class="toggle-switch">
+                <input type="checkbox" checked />
+                <span class="slider"></span>
+              </label>
+            </label>
+          </div>
+          <div class="form-group">
+            <label>Retrain Frequency</label>
+            <select>
+              <option>Daily</option>
+              <option>Weekly</option>
+              <option>Monthly</option>
+            </select>
+          </div>
+          <div class="button-group">
+            <button type="button" class="btn btn-primary">Save Changes</button>
+          </div>
+        </div>
+
+        <!-- Database Settings -->
+        <div class="settings-card">
+          <h2><i class="fas fa-database"></i> Database</h2>
+          <div class="form-group">
+            <label>Database Host</label>
+            <input type="text" value="localhost" placeholder="localhost" />
+          </div>
+          <div class="form-group">
+            <label>Database Port</label>
+            <input type="number" value="5432" placeholder="5432" />
+          </div>
+          <div class="form-group">
+            <label>Database Name</label>
+            <input type="text" value="fraudguard" placeholder="fraudguard" />
+          </div>
+          <div class="form-group">
+            <label style="display: flex; justify-content: space-between; align-items: center;">
+              <span>Connection Pooling</span>
+              <label class="toggle-switch">
+                <input type="checkbox" checked />
+                <span class="slider"></span>
+              </label>
+            </label>
+          </div>
+          <div class="button-group">
+            <button type="button" class="btn btn-primary">Test Connection</button>
+            <button type="button" class="btn btn-secondary">Save</button>
+          </div>
+        </div>
+
+        <!-- System Maintenance -->
+        <div class="settings-card">
+          <h2><i class="fas fa-tools"></i> System Maintenance</h2>
+          <div class="form-group">
+            <label>Cache Size (MB)</label>
+            <input type="number" value="512" min="128" max="2048" />
+          </div>
+          <div class="form-group">
+            <label>Log Retention (days)</label>
+            <input type="number" value="30" min="7" max="365" />
+          </div>
+          <div class="form-group">
+            <label style="display: flex; justify-content: space-between; align-items: center;">
+              <span>Auto-Backup</span>
+              <label class="toggle-switch">
+                <input type="checkbox" checked />
+                <span class="slider"></span>
+              </label>
+            </label>
+          </div>
+          <div class="button-group">
+            <button type="button" class="btn btn-primary">Clear Cache</button>
+            <button type="button" class="btn btn-danger">Reset System</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button type="button" class="theme-toggle" id="themeToggle">
+      <i class="fas fa-moon"></i>
+    </button>
+
+    <script>
+      // Theme toggle
+      const themeToggle = document.getElementById("themeToggle");
+      const html = document.documentElement;
+      const icon = themeToggle.querySelector("i");
+
+      const savedTheme = localStorage.getItem("theme") || "light";
+      html.setAttribute("data-theme", savedTheme);
+      icon.className = savedTheme === "dark" ? "fas fa-sun" : "fas fa-moon";
+
+      themeToggle.addEventListener("click", () => {
+        const currentTheme = html.getAttribute("data-theme");
+        const newTheme = currentTheme === "light" ? "dark" : "light";
+        html.setAttribute("data-theme", newTheme);
+        localStorage.setItem("theme", newTheme);
+        icon.className = newTheme === "dark" ? "fas fa-sun" : "fas fa-moon";
+      });
+
+      // Save button handlers
+      document.querySelectorAll(".btn-primary").forEach((btn) => {
+        btn.addEventListener("click", function () {
+          if (this.textContent.includes("Regenerate")) {
+            alert("API Key regenerated successfully!");
+          } else if (this.textContent.includes("Test Connection")) {
+            alert("Database connection successful!");
+          } else if (this.textContent.includes("Clear Cache")) {
+            alert("Cache cleared successfully!");
+          } else {
+            alert("Settings saved successfully!");
+          }
+        });
+      });
+
+      // Reset button handler
+      document.querySelectorAll(".btn-danger").forEach((btn) => {
+        btn.addEventListener("click", function () {
+          if (confirm("Are you sure you want to reset the system? This action cannot be undone.")) {
+            alert("System reset initiated...");
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
+

@@ -1,0 +1,3291 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FraudGuard AI - Advanced Analytics Suite</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
+    <!-- Advanced Charting Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist@2.26.0/plotly.min.js"></script>
+
+    <!-- Advanced Analytics Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/simple-statistics@7.8.3/dist/simple-statistics.min.js"></script>
+
+    <!-- Advanced Analytics Engine -->
+    <script src="/static/advanced_analytics.js"></script>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --primary: #6366f1;
+        --primary-dark: #4f46e5;
+        --secondary: #8b5cf6;
+        --accent: #06b6d4;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --info: #3b82f6;
+        --dark: #0f172a;
+        --light: #f8fafc;
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-400: #9ca3af;
+        --gray-500: #6b7280;
+        --gray-600: #4b5563;
+        --gray-700: #374151;
+        --gray-800: #1f2937;
+        --gray-900: #111827;
+        --white: #ffffff;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1),
+          0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1),
+          0 4px 6px -4px rgb(0 0 0 / 0.1);
+        --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1),
+          0 10px 10px -6px rgb(0 0 0 / 0.1);
+        --border-radius: 12px;
+        --border-radius-lg: 16px;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      [data-theme="dark"] {
+        --light: #0f172a;
+        --white: #1e293b;
+        --gray-50: #1e293b;
+        --gray-100: #334155;
+        --gray-200: #475569;
+        --gray-300: #64748b;
+        --gray-400: #94a3b8;
+        --gray-500: #cbd5e1;
+        --gray-600: #e2e8f0;
+        --gray-700: #f1f5f9;
+        --gray-800: #f8fafc;
+        --gray-900: #ffffff;
+        --dark: #f8fafc;
+      }
+
+      /* Dark mode text and chart improvements */
+      [data-theme="dark"] .analytics-card {
+        background: var(--gray-100);
+        border-color: var(--gray-200);
+        color: var(--gray-900);
+      }
+
+      [data-theme="dark"] .kpi-card {
+        background: var(--gray-100);
+        border-color: var(--gray-200);
+        color: var(--gray-900);
+      }
+
+      [data-theme="dark"] .card-title {
+        color: var(--gray-900);
+      }
+
+      [data-theme="dark"] .kpi-value {
+        color: var(--gray-900);
+      }
+
+      [data-theme="dark"] .kpi-label {
+        color: var(--gray-700);
+      }
+
+      [data-theme="dark"] .insight-panel {
+        background: var(--gray-100);
+        border-color: var(--gray-200);
+        color: var(--gray-900);
+      }
+
+      [data-theme="dark"] .page-header h1 {
+        color: var(--gray-900);
+      }
+
+      [data-theme="dark"] .page-header p {
+        color: var(--gray-700);
+      }
+
+      body {
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, sans-serif;
+        background: linear-gradient(
+          135deg,
+          var(--light) 0%,
+          var(--gray-50) 100%
+        );
+        color: var(--gray-900);
+        line-height: 1.6;
+        min-height: 100vh;
+        transition: var(--transition);
+      }
+
+      .header {
+        background: var(--white);
+        border-bottom: 1px solid var(--gray-200);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        box-shadow: var(--shadow-sm);
+      }
+
+      .nav {
+        max-width: 1600px;
+        margin: 0 auto;
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary);
+        text-decoration: none;
+        transition: var(--transition);
+      }
+
+      .logo:hover {
+        transform: translateY(-1px);
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .nav-link {
+        color: var(--gray-600);
+        text-decoration: none;
+        font-weight: 500;
+        padding: 0.75rem 1rem;
+        border-radius: var(--border-radius);
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        white-space: nowrap;
+      }
+
+      .nav-link i {
+        font-size: 1rem;
+        width: 16px;
+        text-align: center;
+      }
+
+      .nav-link:hover,
+      .nav-link.active {
+        color: var(--primary);
+        background: var(--gray-50);
+        transform: translateY(-1px);
+      }
+
+      .nav-link.active {
+        background: linear-gradient(
+          135deg,
+          var(--primary) 0%,
+          var(--secondary) 100%
+        );
+        color: var(--white);
+        box-shadow: var(--shadow);
+      }
+
+      .nav-link.active i {
+        color: var(--white);
+      }
+
+      .theme-toggle {
+        background: var(--gray-100);
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: var(--transition);
+        color: var(--gray-600);
+      }
+
+      .theme-toggle:hover {
+        background: var(--gray-200);
+        transform: scale(1.05);
+      }
+
+      .container {
+        max-width: 1600px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+
+      .page-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        padding: 2rem 0;
+      }
+
+      .page-header h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        background: linear-gradient(
+          135deg,
+          var(--primary) 0%,
+          var(--secondary) 100%
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1rem;
+        line-height: 1.2;
+      }
+
+      .page-header p {
+        font-size: 1.25rem;
+        color: var(--gray-600);
+        max-width: 800px;
+        margin: 0 auto;
+        line-height: 1.7;
+      }
+
+      .analytics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2rem;
+      }
+
+      .analytics-card {
+        background: var(--white);
+        border-radius: var(--border-radius-lg);
+        padding: 2rem;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+      }
+
+      .analytics-card:hover {
+        box-shadow: var(--shadow-lg);
+        transform: translateY(-2px);
+      }
+
+      .analytics-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(
+          90deg,
+          var(--primary) 0%,
+          var(--secondary) 100%
+        );
+      }
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+      }
+
+      .card-title {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--gray-900);
+      }
+
+      .card-title i {
+        color: var(--primary);
+        font-size: 1.125rem;
+      }
+
+      .card-actions {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .btn-icon {
+        background: var(--gray-100);
+        border: none;
+        border-radius: 8px;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: var(--transition);
+        color: var(--gray-600);
+      }
+
+      .btn-icon:hover {
+        background: var(--primary);
+        color: var(--white);
+        transform: scale(1.05);
+      }
+
+      .chart-container {
+        position: relative;
+        height: 400px;
+        margin-bottom: 1rem;
+        overflow: hidden; /* Ensure charts don't overflow */
+      }
+
+      /* Ensure charts are responsive */
+      .chart-container canvas,
+      .chart-container svg,
+      .chart-container .plotly-graph-div {
+        max-width: 100% !important;
+        width: 100% !important;
+      }
+
+      /* Improve chart text readability */
+      .chart-container canvas {
+        font-family: "Inter", sans-serif !important;
+      }
+
+      /* Ensure proper spacing for chart elements */
+      .analytics-card .card-header + .chart-container {
+        margin-top: 0;
+      }
+
+      /* Fix chart overflow issues */
+      .chart-container {
+        position: relative;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .chart-container.large {
+        height: 500px;
+      }
+
+      .chart-container.small {
+        height: 300px;
+      }
+
+      .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+
+      .kpi-card {
+        background: linear-gradient(
+          145deg,
+          rgba(255, 255, 255, 0.95) 0%,
+          rgba(248, 250, 252, 0.98) 50%,
+          rgba(255, 255, 255, 0.95) 100%
+        );
+        border-radius: 20px;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08),
+          0 0 0 1px rgba(255, 255, 255, 0.5),
+          inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      }
+
+      .kpi-card::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.4),
+          transparent
+        );
+        transition: left 0.6s ease;
+        z-index: 1;
+        pointer-events: none;
+      }
+
+      .kpi-card:hover {
+        transform: translateY(-6px) scale(1.02);
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12),
+          0 0 0 1px rgba(255, 255, 255, 0.6),
+          inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      }
+
+      .kpi-card:hover::after {
+        left: 100%;
+      }
+
+      .kpi-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--primary);
+      }
+
+      .kpi-value {
+        font-size: 3rem;
+        font-weight: 800;
+        background: linear-gradient(
+          135deg,
+          #6366f1 0%,
+          #8b5cf6 50%,
+          #06b6d4 100%
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.75rem;
+        display: block;
+        position: relative;
+        z-index: 2;
+        filter: drop-shadow(0 2px 4px rgba(99, 102, 241, 0.1));
+      }
+
+      .kpi-label {
+        font-size: 1rem;
+        color: var(--gray-700);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        position: relative;
+        z-index: 2;
+      }
+
+      .kpi-trend {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 700;
+        padding: 0.5rem 1rem;
+        border-radius: 12px;
+        position: relative;
+        z-index: 2;
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+      }
+
+      .trend-up {
+        background: linear-gradient(
+          135deg,
+          rgba(16, 185, 129, 0.1),
+          rgba(16, 185, 129, 0.2)
+        );
+        color: var(--success);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+      }
+
+      .trend-down {
+        background: linear-gradient(
+          135deg,
+          rgba(239, 68, 68, 0.1),
+          rgba(239, 68, 68, 0.2)
+        );
+        color: var(--danger);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+      }
+
+      .trend-neutral {
+        background: linear-gradient(
+          135deg,
+          rgba(107, 114, 128, 0.1),
+          rgba(107, 114, 128, 0.2)
+        );
+        color: var(--gray-600);
+        border: 1px solid rgba(107, 114, 128, 0.3);
+      }
+
+      .insight-panel {
+        background: linear-gradient(
+          135deg,
+          var(--primary) 0%,
+          var(--secondary) 100%
+        );
+        color: var(--white);
+        border-radius: var(--border-radius-lg);
+        padding: 2rem;
+        margin-bottom: 2rem;
+      }
+
+      .insight-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .insight-header i {
+        font-size: 2rem;
+        opacity: 0.9;
+      }
+
+      .insight-header h3 {
+        font-size: 1.5rem;
+        font-weight: 700;
+      }
+
+      .insights-list {
+        list-style: none;
+      }
+
+      .insights-list li {
+        padding: 0.75rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .insights-list li:last-child {
+        border-bottom: none;
+      }
+
+      .insight-icon {
+        width: 32px;
+        height: 32px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .mobile-menu-toggle {
+        display: none;
+        background: var(--gray-100);
+        border: none;
+        border-radius: var(--border-radius);
+        width: 40px;
+        height: 40px;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: var(--transition);
+        color: var(--gray-600);
+      }
+
+      .mobile-menu-toggle:hover {
+        background: var(--gray-200);
+        transform: scale(1.05);
+      }
+
+      /* Large Desktop (1440px+) */
+      @media (min-width: 1440px) {
+        .container {
+          max-width: 1600px;
+        }
+
+        .page-header h1 {
+          font-size: 3.5rem;
+        }
+
+        .analytics-grid {
+          grid-template-columns: repeat(3, 1fr);
+          gap: 2.5rem;
+        }
+
+        .kpi-grid {
+          grid-template-columns: repeat(6, 1fr);
+        }
+      }
+
+      /* Desktop (1200px - 1439px) */
+      @media (max-width: 1439px) and (min-width: 1200px) {
+        .container {
+          max-width: 1400px;
+        }
+
+        .analytics-grid {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 2rem;
+        }
+
+        .kpi-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+
+      /* Small Desktop / Large Laptop (1024px - 1199px) */
+      @media (max-width: 1199px) and (min-width: 1024px) {
+        .container {
+          max-width: 1200px;
+          padding: 1.5rem;
+        }
+
+        .page-header h1 {
+          font-size: 2.75rem;
+        }
+
+        .analytics-grid {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 1.5rem;
+        }
+
+        .kpi-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+
+        .nav-links {
+          gap: 0.75rem;
+        }
+
+        .nav-link {
+          padding: 0.75rem 1rem;
+          font-size: 0.875rem;
+        }
+
+        .chart-container {
+          height: 350px;
+        }
+
+        .chart-container.large {
+          height: 450px;
+        }
+      }
+
+      /* Tablet / iPad (768px - 1023px) */
+      @media (max-width: 1023px) and (min-width: 768px) {
+        .container {
+          max-width: 100%;
+          padding: 1.5rem;
+        }
+
+        .page-header {
+          padding: 1.5rem 0;
+          margin-bottom: 2rem;
+        }
+
+        .page-header h1 {
+          font-size: 2.5rem;
+        }
+
+        .page-header p {
+          font-size: 1.125rem;
+        }
+
+        .kpi-grid {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 1rem;
+        }
+
+        .analytics-grid {
+          grid-template-columns: 1fr;
+          gap: 1.5rem;
+        }
+
+        .nav-links {
+          gap: 0.5rem;
+        }
+
+        .nav-link span {
+          display: none;
+        }
+
+        .nav-link {
+          padding: 0.75rem;
+          min-width: 40px;
+          justify-content: center;
+        }
+
+        .chart-container {
+          height: 300px;
+        }
+
+        .chart-container.large {
+          height: 400px;
+        }
+
+        .chart-container.small {
+          height: 250px;
+        }
+
+        .analytics-card {
+          padding: 1.5rem;
+        }
+
+        .insight-panel {
+          padding: 1.5rem;
+        }
+      }
+
+      /* Mobile Large (480px - 767px) */
+      @media (max-width: 767px) and (min-width: 480px) {
+        .container {
+          padding: 1rem;
+          max-width: 100%;
+        }
+
+        .page-header {
+          padding: 1.5rem 0;
+          margin-bottom: 1.5rem;
+          text-align: center;
+        }
+
+        .page-header h1 {
+          font-size: 2.25rem;
+          line-height: 1.2;
+        }
+
+        .page-header p {
+          font-size: 1rem;
+          max-width: 100%;
+        }
+
+        .kpi-grid {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 1rem;
+        }
+
+        .kpi-card {
+          padding: 1.25rem;
+        }
+
+        .kpi-value {
+          font-size: 2rem;
+        }
+
+        .analytics-grid {
+          grid-template-columns: 1fr;
+          gap: 1.5rem;
+        }
+
+        .analytics-card {
+          padding: 1.5rem;
+        }
+
+        .chart-container {
+          height: 280px;
+        }
+
+        .chart-container.large {
+          height: 350px;
+        }
+
+        .chart-container.small {
+          height: 250px;
+        }
+
+        .insight-panel {
+          padding: 1.5rem;
+          margin-bottom: 1.5rem;
+        }
+
+        .insight-header h3 {
+          font-size: 1.25rem;
+        }
+
+        .nav {
+          padding: 1rem;
+        }
+
+        .mobile-menu-toggle {
+          display: flex;
+        }
+
+        .nav-links {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          background: var(--white);
+          border-top: 1px solid var(--gray-200);
+          flex-direction: column;
+          gap: 0;
+          padding: 1rem;
+          box-shadow: var(--shadow-lg);
+          transform: translateY(-100%);
+          opacity: 0;
+          visibility: hidden;
+          transition: var(--transition);
+          z-index: 1000;
+        }
+
+        .nav-links.active {
+          transform: translateY(0);
+          opacity: 1;
+          visibility: visible;
+        }
+
+        .nav-link {
+          width: 100%;
+          justify-content: flex-start;
+          padding: 1rem;
+          border-radius: var(--border-radius);
+        }
+
+        .nav-link span {
+          display: inline;
+        }
+
+        .theme-toggle {
+          margin-top: 1rem;
+          align-self: flex-start;
+        }
+
+        .card-actions {
+          flex-wrap: wrap;
+          gap: 0.5rem;
+        }
+
+        .btn-icon {
+          width: 32px;
+          height: 32px;
+        }
+      }
+
+      /* Mobile Small (320px - 479px) */
+      @media (max-width: 479px) {
+        .container {
+          padding: 0.75rem;
+        }
+
+        .page-header {
+          padding: 1rem 0;
+          margin-bottom: 1rem;
+        }
+
+        .page-header h1 {
+          font-size: 1.875rem;
+          line-height: 1.1;
+        }
+
+        .page-header p {
+          font-size: 0.875rem;
+        }
+
+        .kpi-grid {
+          grid-template-columns: 1fr;
+          gap: 0.75rem;
+        }
+
+        .kpi-card {
+          padding: 1rem;
+          text-align: center;
+        }
+
+        .kpi-value {
+          font-size: 1.75rem;
+        }
+
+        .kpi-label {
+          font-size: 0.75rem;
+        }
+
+        .kpi-trend {
+          font-size: 0.75rem;
+        }
+
+        .analytics-card {
+          padding: 1rem;
+          margin-bottom: 1rem;
+        }
+
+        .card-title {
+          font-size: 1rem;
+        }
+
+        .chart-container {
+          height: 250px;
+        }
+
+        .chart-container.large {
+          height: 300px;
+        }
+
+        .chart-container.small {
+          height: 200px;
+        }
+
+        .insight-panel {
+          padding: 1rem;
+          margin-bottom: 1rem;
+        }
+
+        .insight-header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 0.5rem;
+        }
+
+        .insight-header h3 {
+          font-size: 1.125rem;
+        }
+
+        .insights-list li {
+          padding: 0.5rem 0;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 0.5rem;
+        }
+
+        .insight-icon {
+          width: 28px;
+          height: 28px;
+        }
+
+        .nav {
+          padding: 0.75rem 1rem;
+        }
+
+        .logo {
+          font-size: 1.25rem;
+        }
+
+        .logo span {
+          display: none;
+        }
+
+        .card-actions {
+          justify-content: center;
+          margin-top: 1rem;
+        }
+
+        .btn-icon {
+          width: 28px;
+          height: 28px;
+        }
+      }
+
+      .loading-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--border-radius-lg);
+        z-index: 10;
+      }
+
+      .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid var(--gray-200);
+        border-top: 4px solid var(--primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      /* Enhanced Modal System for Analytics with Professional Polish */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+          135deg,
+          rgba(0, 0, 0, 0.8) 0%,
+          rgba(30, 41, 59, 0.9) 50%,
+          rgba(0, 0, 0, 0.85) 100%
+        );
+        -webkit-backdrop-filter: blur(12px) saturate(1.2);
+        backdrop-filter: blur(12px) saturate(1.2);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        padding: 1rem;
+      }
+
+      .modal-overlay.active {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .modal-content {
+        background: linear-gradient(
+          145deg,
+          rgba(255, 255, 255, 0.95) 0%,
+          rgba(248, 250, 252, 0.98) 50%,
+          rgba(255, 255, 255, 0.95) 100%
+        );
+        border-radius: 24px;
+        box-shadow: 0 32px 64px -12px rgba(0, 0, 0, 0.35),
+          0 0 0 1px rgba(255, 255, 255, 0.2),
+          inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        max-width: 95vw;
+        max-height: 95vh;
+        width: 100%;
+        max-width: 1400px;
+        overflow: hidden;
+        transform: scale(0.9) translateY(30px) rotateX(5deg);
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
+
+      .modal-overlay.active .modal-content {
+        transform: scale(1) translateY(0) rotateX(0deg);
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 2rem 2.5rem 1.5rem;
+        border-bottom: 2px solid transparent;
+        background: linear-gradient(
+          135deg,
+          rgba(99, 102, 241, 0.08) 0%,
+          rgba(139, 92, 246, 0.05) 50%,
+          rgba(255, 255, 255, 0.95) 100%
+        );
+        position: relative;
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+      }
+
+      .modal-header::before {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--primary-500),
+          transparent
+        );
+      }
+
+      .modal-title {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        letter-spacing: -0.025em;
+      }
+
+      .modal-title i {
+        font-size: 1.5rem;
+        color: var(--primary-500);
+        background: var(--primary-50);
+        padding: 0.75rem;
+        border-radius: 12px;
+      }
+
+      .modal-close {
+        background: var(--gray-100);
+        border: none;
+        font-size: 1.25rem;
+        color: var(--gray-600);
+        cursor: pointer;
+        padding: 0.75rem;
+        border-radius: 12px;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+      }
+
+      .modal-close:hover {
+        background: var(--red-100);
+        color: var(--red-600);
+        transform: scale(1.05);
+      }
+
+      .modal-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* Modal Footer */
+      .modal-footer {
+        padding: 1.5rem 2.5rem;
+        border-top: 1px solid var(--gray-200);
+        background: linear-gradient(
+          180deg,
+          rgba(248, 250, 252, 0.8) 0%,
+          rgba(255, 255, 255, 0.95) 100%
+        );
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+      }
+
+      .modal-footer-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        align-items: center;
+      }
+
+      .modal-footer .btn {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s ease;
+      }
+
+      .modal-footer .btn-primary {
+        background: var(--primary-500);
+        color: white;
+      }
+
+      .modal-footer .btn-primary:hover {
+        background: var(--primary-600);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+      }
+
+      .modal-footer .btn-secondary {
+        background: var(--gray-100);
+        color: var(--gray-700);
+      }
+
+      .modal-footer .btn-secondary:hover {
+        background: var(--gray-200);
+        color: var(--gray-900);
+        transform: translateY(-2px);
+      }
+
+      /* Modal Content Layout */
+      .modal-analytics-container {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+        padding: 2rem 2.5rem;
+        min-height: 600px;
+      }
+
+      .modal-chart-section {
+        background: linear-gradient(
+          145deg,
+          rgba(248, 250, 252, 0.8) 0%,
+          rgba(241, 245, 249, 0.9) 50%,
+          rgba(255, 255, 255, 0.95) 100%
+        );
+        border-radius: 20px;
+        padding: 2.5rem;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1),
+          inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      }
+
+      .modal-chart-section::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: linear-gradient(
+          90deg,
+          #6366f1 0%,
+          #8b5cf6 25%,
+          #06b6d4 50%,
+          #10b981 75%,
+          #f59e0b 100%
+        );
+        box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+      }
+
+      .modal-chart-section::after {
+        content: "";
+        position: absolute;
+        top: 5px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.1) 0%,
+          transparent 20%
+        );
+        pointer-events: none;
+      }
+
+      .modal-chart-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .modal-chart-container {
+        flex: 1;
+        min-height: 450px;
+        position: relative;
+        background: var(--white);
+        border-radius: 12px;
+        padding: 1rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      }
+
+      .modal-insights-section {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+
+      .modal-insights-card {
+        background: linear-gradient(
+          145deg,
+          rgba(255, 255, 255, 0.95) 0%,
+          rgba(248, 250, 252, 0.98) 100%
+        );
+        border-radius: 18px;
+        padding: 2rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08),
+          0 0 0 1px rgba(255, 255, 255, 0.5),
+          inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .modal-insights-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(99, 102, 241, 0.6) 50%,
+          transparent 100%
+        );
+      }
+
+      .modal-insights-card:hover {
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12),
+          0 0 0 1px rgba(255, 255, 255, 0.6),
+          inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      }
+
+      .insights-card-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .insights-card-title i {
+        color: var(--primary-500);
+        font-size: 1rem;
+      }
+
+      .insights-metric {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid var(--gray-100);
+      }
+
+      .insights-metric:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+      }
+
+      .metric-label {
+        font-size: 0.9rem;
+        color: var(--gray-600);
+        font-weight: 500;
+      }
+
+      .metric-value {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+
+      .metric-value.positive {
+        color: var(--green-600);
+      }
+
+      .metric-value.negative {
+        color: var(--red-600);
+      }
+
+      .metric-value.neutral {
+        color: var(--blue-600);
+      }
+
+      /* AI Insights Section with Professional Polish */
+      .ai-insights {
+        background: linear-gradient(
+          135deg,
+          rgba(99, 102, 241, 0.08) 0%,
+          rgba(139, 92, 246, 0.12) 50%,
+          rgba(6, 182, 212, 0.08) 100%
+        );
+        border: 2px solid transparent;
+        border-radius: 20px;
+        padding: 2rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(99, 102, 241, 0.15),
+          inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      }
+
+      .ai-insights::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+          135deg,
+          rgba(99, 102, 241, 0.1) 0%,
+          rgba(139, 92, 246, 0.15) 50%,
+          rgba(6, 182, 212, 0.1) 100%
+        );
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        z-index: -1;
+      }
+
+      .ai-insights::after {
+        content: "🤖";
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        font-size: 2rem;
+        opacity: 0.2;
+        filter: drop-shadow(0 2px 4px rgba(99, 102, 241, 0.3));
+      }
+
+      .ai-insights-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--primary-700);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .ai-insight-item {
+        background: var(--white);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        font-size: 0.9rem;
+        color: var(--gray-700);
+        line-height: 1.5;
+        border-left: 4px solid var(--primary-400);
+      }
+
+      .ai-insight-item:last-child {
+        margin-bottom: 0;
+      }
+
+      /* Responsive Modal Design */
+      @media (max-width: 1024px) {
+        .modal-analytics-container {
+          grid-template-columns: 1fr;
+          gap: 1.5rem;
+          padding: 1.5rem;
+        }
+
+        .modal-chart-container {
+          min-height: 350px;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .modal-content {
+          max-width: 98vw;
+          max-height: 98vh;
+          border-radius: 12px;
+        }
+
+        .modal-header {
+          padding: 1.5rem 1.5rem 1rem;
+        }
+
+        .modal-title {
+          font-size: 1.5rem;
+        }
+
+        .modal-analytics-container {
+          padding: 1rem;
+          gap: 1rem;
+        }
+
+        .modal-chart-section {
+          padding: 1.5rem;
+        }
+
+        .modal-chart-container {
+          min-height: 300px;
+        }
+      }
+
+      /* Dark mode modal styles */
+      [data-theme="dark"] .modal-content {
+        background: var(--gray-100);
+        border-color: var(--gray-200);
+      }
+
+      [data-theme="dark"] .modal-header {
+        background: linear-gradient(
+          135deg,
+          var(--gray-50) 0%,
+          var(--gray-100) 100%
+        );
+        border-color: var(--gray-200);
+      }
+
+      [data-theme="dark"] .modal-title {
+        color: var(--gray-900);
+      }
+
+      [data-theme="dark"] .modal-close {
+        background: var(--gray-200);
+        color: var(--gray-700);
+      }
+
+      [data-theme="dark"] .modal-close:hover {
+        background: var(--red-100);
+        color: var(--red-600);
+      }
+
+      [data-theme="dark"] .modal-chart-section {
+        background: var(--gray-50);
+      }
+
+      [data-theme="dark"] .modal-chart-container {
+        background: var(--gray-100);
+      }
+
+      [data-theme="dark"] .modal-insights-card {
+        background: var(--gray-100);
+        border-color: var(--gray-200);
+      }
+
+      [data-theme="dark"] .ai-insights {
+        background: linear-gradient(
+          135deg,
+          var(--primary-100) 0%,
+          var(--secondary-100) 100%
+        );
+        border-color: var(--primary-200);
+      }
+
+      [data-theme="dark"] .ai-insight-item {
+        background: var(--gray-100);
+        color: var(--gray-800);
+      }
+
+      /* Card hover effect for pop-up indication */
+      .analytics-card:hover {
+        box-shadow: var(--shadow-lg);
+        transform: translateY(-2px) scale(1.02);
+      }
+
+      .analytics-card::after {
+        content: "🔍 Click to expand";
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: linear-gradient(
+          135deg,
+          rgba(99, 102, 241, 0.9) 0%,
+          rgba(139, 92, 246, 0.9) 100%
+        );
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        opacity: 0;
+        transform: translateY(-10px) scale(0.9);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        pointer-events: none;
+        z-index: 10;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+      }
+
+      .analytics-card:hover::after {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+
+      /* Touch-friendly improvements */
+      @media (hover: none) and (pointer: coarse) {
+        .btn-icon,
+        .nav-link,
+        .theme-toggle,
+        .mobile-menu-toggle {
+          min-height: 44px;
+          min-width: 44px;
+        }
+
+        .analytics-card:hover,
+        .kpi-card:hover {
+          transform: none; /* Disable hover effects on touch devices */
+        }
+
+        .nav-link:hover {
+          transform: none;
+        }
+
+        .btn-icon:hover {
+          transform: none;
+        }
+      }
+
+      /* High DPI displays */
+      @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+        .logo i,
+        .nav-link i,
+        .card-title i,
+        .btn-icon i {
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+      }
+
+      /* Landscape orientation on mobile */
+      @media (max-width: 767px) and (orientation: landscape) {
+        .page-header {
+          padding: 0.75rem 0;
+          margin-bottom: 1rem;
+        }
+
+        .page-header h1 {
+          font-size: 1.75rem;
+        }
+
+        .nav {
+          padding: 0.5rem 1rem;
+        }
+
+        .container {
+          padding: 0.75rem;
+        }
+
+        .kpi-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+
+        .chart-container {
+          height: 200px;
+        }
+
+        .chart-container.large {
+          height: 250px;
+        }
+      }
+
+      /* Print styles */
+      @media print {
+        .nav,
+        .theme-toggle,
+        .mobile-menu-toggle,
+        .btn-icon,
+        .card-actions {
+          display: none !important;
+        }
+
+        .container {
+          max-width: 100% !important;
+          padding: 0 !important;
+        }
+
+        .analytics-card,
+        .kpi-card {
+          break-inside: avoid;
+          box-shadow: none !important;
+          border: 1px solid #ccc !important;
+        }
+
+        .page-header {
+          padding: 1rem 0 !important;
+        }
+
+        .insight-panel {
+          background: #f8f9fa !important;
+          color: #000 !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <nav class="nav">
+        <a href="/" class="logo">
+          <i class="fas fa-chart-line"></i>
+          <span>FraudGuard Analytics</span>
+        </a>
+        <button
+          type="button"
+          class="mobile-menu-toggle"
+          id="mobileMenuToggle"
+          aria-label="Toggle mobile menu"
+        >
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="nav-links" id="navLinks">
+          <a href="/static/index.html" class="nav-link">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+          </a>
+          <a href="/static/dashboard.html" class="nav-link">
+            <i class="fas fa-chart-line"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="/static/analytics_dashboard.html" class="nav-link active">
+            <i class="fas fa-chart-bar"></i>
+            <span>Analytics</span>
+          </a>
+          <a href="/static/models.html" class="nav-link">
+            <i class="fas fa-brain"></i>
+            <span>Models</span>
+          </a>
+          <a href="/static/monitoring.html" class="nav-link">
+            <i class="fas fa-heartbeat"></i>
+            <span>Monitoring</span>
+          </a>
+          <a href="/static/reports.html" class="nav-link">
+            <i class="fas fa-file-alt"></i>
+            <span>Reports</span>
+          </a>
+          <a href="/docs" class="nav-link">
+            <i class="fas fa-book"></i>
+            <span>API Docs</span>
+          </a>
+          <button
+            type="button"
+            class="theme-toggle"
+            id="themeToggle"
+            aria-label="Toggle theme"
+          >
+            <i class="fas fa-moon"></i>
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+      <!-- Page Header -->
+      <section class="page-header">
+        <h1>Advanced Analytics Suite</h1>
+        <p>
+          Comprehensive fraud detection analytics with predictive forecasting,
+          trend analysis, and AI-powered insights to stay ahead of emerging
+          fraud patterns.
+        </p>
+      </section>
+
+      <!-- KPI Dashboard -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <span class="kpi-value" id="fraudRate">2.3%</span>
+          <div class="kpi-label">Current Fraud Rate</div>
+          <div class="kpi-trend trend-down">
+            <i class="fas fa-arrow-down"></i>
+            <span>-0.4% vs last week</span>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-value" id="predictedFraud">156</span>
+          <div class="kpi-label">Predicted Fraud (24h)</div>
+          <div class="kpi-trend trend-up">
+            <i class="fas fa-arrow-up"></i>
+            <span>+12% vs yesterday</span>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-value" id="modelAccuracy">96.8%</span>
+          <div class="kpi-label">Model Accuracy</div>
+          <div class="kpi-trend trend-up">
+            <i class="fas fa-arrow-up"></i>
+            <span>+0.3% improvement</span>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-value" id="anomalyScore">7.2</span>
+          <div class="kpi-label">Anomaly Score</div>
+          <div class="kpi-trend trend-neutral">
+            <i class="fas fa-minus"></i>
+            <span>Normal range</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI-Powered Insights Panel -->
+      <div class="insight-panel">
+        <div class="insight-header">
+          <i class="fas fa-brain"></i>
+          <h3>AI-Powered Insights</h3>
+        </div>
+        <ul class="insights-list" id="aiInsights">
+          <li>
+            <div class="insight-icon">
+              <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div>
+              <strong>Fraud Spike Detected:</strong> 23% increase in high-risk
+              transactions from IP range 192.168.1.0/24 in the last 2 hours.
+            </div>
+          </li>
+          <li>
+            <div class="insight-icon">
+              <i class="fas fa-chart-line"></i>
+            </div>
+            <div>
+              <strong>Trend Alert:</strong> Weekend fraud patterns show 15%
+              higher activity. Consider adjusting monitoring thresholds.
+            </div>
+          </li>
+          <li>
+            <div class="insight-icon">
+              <i class="fas fa-lightbulb"></i>
+            </div>
+            <div>
+              <strong>Model Recommendation:</strong> Feature importance analysis
+              suggests adding "time_since_last_transaction" could improve
+              accuracy by 2.1%.
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Analytics Grid -->
+      <div class="analytics-grid">
+        <!-- Predictive Forecasting Chart -->
+        <div class="analytics-card">
+          <div class="card-header">
+            <div class="card-title">
+              <i class="fas fa-crystal-ball"></i>
+              Fraud Prediction Forecast
+            </div>
+            <div class="card-actions">
+              <button
+                type="button"
+                class="btn-icon"
+                title="Refresh"
+                onclick="refreshForecast()"
+              >
+                <i class="fas fa-sync-alt"></i>
+              </button>
+              <button
+                type="button"
+                class="btn-icon"
+                title="Settings"
+                onclick="openForecastSettings()"
+              >
+                <i class="fas fa-cog"></i>
+              </button>
+            </div>
+          </div>
+          <div class="chart-container large">
+            <canvas id="forecastChart"></canvas>
+            <div class="loading-overlay hidden" id="forecastLoading">
+              <div class="loading-spinner"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trend Analysis -->
+        <div class="analytics-card">
+          <div class="card-header">
+            <div class="card-title">
+              <i class="fas fa-trending-up"></i>
+              Fraud Trend Analysis
+            </div>
+            <div class="card-actions">
+              <button
+                type="button"
+                class="btn-icon"
+                title="Export"
+                onclick="exportTrendData()"
+              >
+                <i class="fas fa-download"></i>
+              </button>
+              <button
+                type="button"
+                class="btn-icon"
+                title="Drill Down"
+                onclick="drillDownTrends()"
+              >
+                <i class="fas fa-search-plus"></i>
+              </button>
+            </div>
+          </div>
+          <div class="chart-container large">
+            <canvas id="trendChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Anomaly Detection -->
+        <div class="analytics-card">
+          <div class="card-header">
+            <div class="card-title">
+              <i class="fas fa-exclamation-circle"></i>
+              Anomaly Detection
+            </div>
+            <div class="card-actions">
+              <button
+                type="button"
+                class="btn-icon"
+                title="Alert Settings"
+                onclick="configureAnomalyAlerts()"
+              >
+                <i class="fas fa-bell"></i>
+              </button>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="anomalyChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Model Performance Comparison -->
+        <div class="analytics-card">
+          <div class="card-header">
+            <div class="card-title">
+              <i class="fas fa-balance-scale"></i>
+              Model Performance Comparison
+            </div>
+            <div class="card-actions">
+              <button
+                type="button"
+                class="btn-icon"
+                title="Add Model"
+                onclick="addModelComparison()"
+              >
+                <i class="fas fa-plus"></i>
+              </button>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="modelComparisonChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Geographic Fraud Distribution -->
+        <div class="analytics-card">
+          <div class="card-header">
+            <div class="card-title">
+              <i class="fas fa-globe-americas"></i>
+              Geographic Fraud Distribution
+            </div>
+            <div class="card-actions">
+              <button
+                type="button"
+                class="btn-icon"
+                title="Full Screen"
+                onclick="expandGeoMap()"
+              >
+                <i class="fas fa-expand"></i>
+              </button>
+            </div>
+          </div>
+          <div class="chart-container">
+            <div id="geoChart"></div>
+          </div>
+        </div>
+
+        <!-- Feature Importance Analysis -->
+        <div class="analytics-card">
+          <div class="card-header">
+            <div class="card-title">
+              <i class="fas fa-weight-hanging"></i>
+              Feature Importance Analysis
+            </div>
+            <div class="card-actions">
+              <button
+                type="button"
+                class="btn-icon"
+                title="SHAP Analysis"
+                onclick="runSHAPAnalysis()"
+              >
+                <i class="fas fa-microscope"></i>
+              </button>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="featureImportanceChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Advanced Time Series Analysis -->
+      <div class="analytics-card" style="margin-bottom: 2rem">
+        <div class="card-header">
+          <div class="card-title">
+            <i class="fas fa-chart-area"></i>
+            Advanced Time Series Analysis
+          </div>
+          <div class="card-actions">
+            <button
+              type="button"
+              class="btn-icon"
+              title="Seasonality Analysis"
+              onclick="analyzeSeasonality()"
+            >
+              <i class="fas fa-calendar-alt"></i>
+            </button>
+            <button
+              type="button"
+              class="btn-icon"
+              title="Correlation Matrix"
+              onclick="showCorrelationMatrix()"
+            >
+              <i class="fas fa-project-diagram"></i>
+            </button>
+          </div>
+        </div>
+        <div class="chart-container large">
+          <div id="timeSeriesChart"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Global theme management
+      let currentTheme = localStorage.getItem("theme") || "light";
+
+      // Initialize theme on page load
+      document.addEventListener("DOMContentLoaded", function () {
+        initializeTheme();
+        setupEventListeners();
+      });
+
+      // Theme Management
+      function initializeTheme() {
+        document.documentElement.setAttribute("data-theme", currentTheme);
+        updateThemeIcon();
+      }
+
+      function toggleTheme() {
+        currentTheme = currentTheme === "light" ? "dark" : "light";
+        document.documentElement.setAttribute("data-theme", currentTheme);
+        localStorage.setItem("theme", currentTheme);
+        updateThemeIcon();
+        if (window.analyticsEngine) {
+          window.analyticsEngine.updateChartsTheme();
+        }
+      }
+
+      function updateThemeIcon() {
+        const themeIcon = document.querySelector("#themeToggle i");
+        themeIcon.className =
+          currentTheme === "light" ? "fas fa-moon" : "fas fa-sun";
+      }
+
+      // Event Listeners
+      function setupEventListeners() {
+        document
+          .getElementById("themeToggle")
+          .addEventListener("click", toggleTheme);
+
+        // Mobile menu toggle
+        const mobileMenuToggle = document.getElementById("mobileMenuToggle");
+        const navLinks = document.getElementById("navLinks");
+
+        if (mobileMenuToggle && navLinks) {
+          mobileMenuToggle.addEventListener("click", function () {
+            navLinks.classList.toggle("active");
+            const icon = mobileMenuToggle.querySelector("i");
+            if (navLinks.classList.contains("active")) {
+              icon.className = "fas fa-times";
+            } else {
+              icon.className = "fas fa-bars";
+            }
+          });
+
+          // Close mobile menu when clicking outside
+          document.addEventListener("click", function (event) {
+            if (
+              !mobileMenuToggle.contains(event.target) &&
+              !navLinks.contains(event.target)
+            ) {
+              navLinks.classList.remove("active");
+              mobileMenuToggle.querySelector("i").className = "fas fa-bars";
+            }
+          });
+
+          // Close mobile menu when clicking on a nav link
+          navLinks.addEventListener("click", function (event) {
+            if (event.target.classList.contains("nav-link")) {
+              navLinks.classList.remove("active");
+              mobileMenuToggle.querySelector("i").className = "fas fa-bars";
+            }
+          });
+        }
+
+        // Card pop-up functionality
+        setupCardPopups();
+      }
+
+      // Card pop-up functionality
+      function setupCardPopups() {
+        const analyticsCards = document.querySelectorAll(".analytics-card");
+        analyticsCards.forEach((card) => {
+          card.addEventListener("click", function (e) {
+            // Don't trigger if clicking on buttons
+            if (
+              e.target.closest(".btn-icon") ||
+              e.target.closest(".card-actions")
+            ) {
+              return;
+            }
+            openCardModal(this);
+          });
+        });
+      }
+
+      function openCardModal(card) {
+        const modal = document.getElementById("cardModal");
+        const modalTitle = document.getElementById("modalTitle");
+        const modalChartTitle = document.getElementById("modalChartTitle");
+        const modalChartContainer = document.getElementById(
+          "modalChartContainer"
+        );
+        const modalKeyMetrics = document.getElementById("modalKeyMetrics");
+        const modalTrends = document.getElementById("modalTrends");
+        const modalAIInsights = document.getElementById("modalAIInsights");
+
+        // Get card information
+        const cardTitle = card.querySelector(".card-title");
+        const chartCanvas = card.querySelector("canvas");
+
+        // Determine chart type and data
+        const chartType = getChartTypeFromCard(card);
+        const chartData = getChartDataFromCard(card, chartType);
+
+        // Update modal title
+        if (cardTitle) {
+          modalTitle.innerHTML = cardTitle.innerHTML;
+          modalChartTitle.innerHTML = `<i class="fas fa-chart-area"></i> ${cardTitle.textContent.trim()}`;
+        }
+
+        // Clear previous content
+        modalChartContainer.innerHTML =
+          '<canvas id="modalChart" style="width: 100%; height: 100%;"></canvas>';
+        modalKeyMetrics.innerHTML = "";
+        modalTrends.innerHTML = "";
+        modalAIInsights.innerHTML = "";
+
+        // Populate insights based on chart type
+        populateModalInsights(
+          chartType,
+          chartData,
+          modalKeyMetrics,
+          modalTrends,
+          modalAIInsights
+        );
+
+        // Show modal
+        modal.classList.add("active");
+        document.body.style.overflow = "hidden";
+
+        // Create enhanced chart in modal
+        setTimeout(() => {
+          createEnhancedModalChart(chartType, chartData);
+        }, 100);
+      }
+
+      // Helper function to determine chart type from card
+      function getChartTypeFromCard(card) {
+        // First try to identify by canvas/div ID
+        const canvas = card.querySelector("canvas");
+        const plotlyDiv = card.querySelector("div[id$='Chart']");
+
+        if (canvas) {
+          const canvasId = canvas.id;
+          switch (canvasId) {
+            case "forecastChart":
+              return "forecast";
+            case "trendChart":
+              return "trend";
+            case "anomalyChart":
+              return "anomaly";
+            case "modelComparisonChart":
+              return "model";
+            case "featureImportanceChart":
+              return "feature";
+            default:
+              break;
+          }
+        }
+
+        if (plotlyDiv) {
+          const divId = plotlyDiv.id;
+          switch (divId) {
+            case "geoChart":
+              return "geographic";
+            case "timeSeriesChart":
+              return "timeseries";
+            default:
+              break;
+          }
+        }
+
+        // Fallback to title-based detection
+        const cardTitle =
+          card.querySelector(".card-title")?.textContent.toLowerCase() || "";
+
+        if (cardTitle.includes("forecast") || cardTitle.includes("prediction"))
+          return "forecast";
+        if (cardTitle.includes("trend") || cardTitle.includes("analysis"))
+          return "trend";
+        if (cardTitle.includes("anomaly") || cardTitle.includes("detection"))
+          return "anomaly";
+        if (cardTitle.includes("model") || cardTitle.includes("comparison"))
+          return "model";
+        if (cardTitle.includes("feature") || cardTitle.includes("importance"))
+          return "feature";
+        if (
+          cardTitle.includes("geographic") ||
+          cardTitle.includes("distribution")
+        )
+          return "geographic";
+        if (cardTitle.includes("time series")) return "timeseries";
+
+        return "generic";
+      }
+
+      // Helper function to get chart data (mock data for demo)
+      function getChartDataFromCard(card, chartType) {
+        // In a real application, this would extract actual data from the chart
+        // For demo purposes, we'll return mock data based on chart type
+        return {
+          type: chartType,
+          timestamp: new Date().toISOString(),
+          dataPoints: Math.floor(Math.random() * 100) + 50,
+          accuracy: (Math.random() * 0.2 + 0.8).toFixed(3),
+          trend: Math.random() > 0.5 ? "increasing" : "decreasing",
+          anomalies: Math.floor(Math.random() * 5),
+          confidence: (Math.random() * 0.3 + 0.7).toFixed(2),
+        };
+      }
+
+      // Function to populate modal insights
+      function populateModalInsights(
+        chartType,
+        chartData,
+        metricsEl,
+        trendsEl,
+        aiEl
+      ) {
+        // Populate Key Metrics
+        const metrics = getMetricsForChartType(chartType, chartData);
+        metricsEl.innerHTML = metrics
+          .map(
+            (metric) => `
+          <div class="insights-metric">
+            <span class="metric-label">${metric.label}</span>
+            <span class="metric-value ${metric.class}">${metric.value}</span>
+          </div>
+        `
+          )
+          .join("");
+
+        // Populate Trends
+        const trends = getTrendsForChartType(chartType, chartData);
+        trendsEl.innerHTML = trends
+          .map(
+            (trend) => `
+          <div class="insights-metric">
+            <span class="metric-label">${trend.label}</span>
+            <span class="metric-value ${trend.class}">${trend.value}</span>
+          </div>
+        `
+          )
+          .join("");
+
+        // Populate AI Insights
+        const insights = getAIInsightsForChartType(chartType, chartData);
+        aiEl.innerHTML = insights
+          .map(
+            (insight) => `
+          <div class="ai-insight-item">${insight}</div>
+        `
+          )
+          .join("");
+      }
+
+      // Get metrics based on chart type
+      function getMetricsForChartType(chartType, data) {
+        const baseMetrics = [
+          { label: "Data Points", value: data.dataPoints, class: "neutral" },
+          {
+            label: "Accuracy",
+            value: `${(data.accuracy * 100).toFixed(1)}%`,
+            class: "positive",
+          },
+          {
+            label: "Confidence",
+            value: `${(data.confidence * 100).toFixed(0)}%`,
+            class: "positive",
+          },
+        ];
+
+        switch (chartType) {
+          case "forecast":
+            return [
+              ...baseMetrics,
+              {
+                label: "Prediction Horizon",
+                value: "30 days",
+                class: "neutral",
+              },
+              {
+                label: "Model Type",
+                value: "LSTM Neural Network",
+                class: "neutral",
+              },
+            ];
+          case "trend":
+            return [
+              ...baseMetrics,
+              {
+                label: "Trend Direction",
+                value:
+                  data.trend === "increasing" ? "↗ Increasing" : "↘ Decreasing",
+                class: data.trend === "increasing" ? "positive" : "negative",
+              },
+              { label: "Volatility", value: "Medium", class: "neutral" },
+            ];
+          case "anomaly":
+            return [
+              ...baseMetrics,
+              {
+                label: "Anomalies Detected",
+                value: data.anomalies,
+                class: data.anomalies > 2 ? "negative" : "positive",
+              },
+              { label: "Detection Rate", value: "98.5%", class: "positive" },
+            ];
+          default:
+            return baseMetrics;
+        }
+      }
+
+      // Get trends based on chart type
+      function getTrendsForChartType(chartType, data) {
+        switch (chartType) {
+          case "forecast":
+            return [
+              { label: "Weekly Change", value: "+2.3%", class: "positive" },
+              { label: "Monthly Outlook", value: "Stable", class: "neutral" },
+              { label: "Risk Level", value: "Low", class: "positive" },
+            ];
+          case "trend":
+            return [
+              { label: "Growth Rate", value: "+5.2%", class: "positive" },
+              { label: "Seasonality", value: "Strong", class: "neutral" },
+              { label: "Correlation", value: "0.87", class: "positive" },
+            ];
+          case "anomaly":
+            return [
+              { label: "Alert Frequency", value: "3/week", class: "neutral" },
+              { label: "False Positives", value: "1.2%", class: "positive" },
+              { label: "Response Time", value: "< 5min", class: "positive" },
+            ];
+          default:
+            return [
+              { label: "Performance", value: "Excellent", class: "positive" },
+              { label: "Stability", value: "High", class: "positive" },
+              { label: "Efficiency", value: "94%", class: "positive" },
+            ];
+        }
+      }
+
+      // Get AI insights based on chart type
+      function getAIInsightsForChartType(chartType, data) {
+        switch (chartType) {
+          case "forecast":
+            return [
+              "The model predicts a 15% increase in fraud attempts during holiday seasons based on historical patterns.",
+              "Geographic clustering analysis suggests focusing monitoring efforts on metropolitan areas.",
+              "Transaction velocity patterns indicate optimal detection windows between 2-4 AM UTC.",
+            ];
+          case "trend":
+            return [
+              "Fraud rates show strong correlation with economic indicators, particularly unemployment rates.",
+              "Mobile payment fraud is trending upward while traditional card fraud is declining.",
+              "Weekend patterns suggest different fraud strategies requiring adaptive detection algorithms.",
+            ];
+          case "anomaly":
+            return [
+              "Recent anomalies cluster around new payment methods, suggesting emerging fraud vectors.",
+              "Machine learning confidence scores have improved 23% with the latest model update.",
+              "Cross-border transaction anomalies require enhanced verification protocols.",
+            ];
+          case "geographic":
+            return [
+              "Fraud hotspots are shifting from urban to suburban areas, indicating evolving criminal strategies.",
+              "International fraud patterns suggest coordinated attacks across multiple regions.",
+              "Geolocation accuracy improvements have reduced false positives by 18%.",
+            ];
+          default:
+            return [
+              "Advanced analytics reveal hidden patterns in transaction behavior.",
+              "Machine learning models continuously adapt to emerging fraud techniques.",
+              "Real-time monitoring ensures rapid response to suspicious activities.",
+            ];
+        }
+      }
+
+      // Create enhanced modal chart
+      function createEnhancedModalChart(chartType, data) {
+        const modalChartContainer = document.getElementById(
+          "modalChartContainer"
+        );
+
+        // Handle different chart types
+        switch (chartType) {
+          case "geographic":
+          case "timeseries":
+            // For Plotly charts, create a div instead of canvas
+            modalChartContainer.innerHTML =
+              '<div id="modalChart" style="width: 100%; height: 100%;"></div>';
+            createEnhancedPlotlyChart(chartType, data);
+            break;
+          default:
+            // For Chart.js charts, use canvas
+            modalChartContainer.innerHTML =
+              '<canvas id="modalChart" style="width: 100%; height: 100%;"></canvas>';
+            const ctx = document.getElementById("modalChart").getContext("2d");
+
+            // Use the analytics engine to create appropriate chart
+            if (window.analyticsEngine) {
+              switch (chartType) {
+                case "forecast":
+                  window.analyticsEngine.createModalForecastChart("modalChart");
+                  break;
+                case "trend":
+                  window.analyticsEngine.createModalTrendChart("modalChart");
+                  break;
+                case "feature":
+                  window.analyticsEngine.createModalFeatureImportanceChart(
+                    "modalChart"
+                  );
+                  break;
+                case "anomaly":
+                  createEnhancedAnomalyChart(ctx, data);
+                  break;
+                case "model":
+                  createEnhancedModelChart(ctx, data);
+                  break;
+                default:
+                  createGenericModalChart(ctx, chartType, data);
+                  break;
+              }
+            } else {
+              createGenericModalChart(ctx, chartType, data);
+            }
+            break;
+        }
+      }
+
+      // Create enhanced Plotly charts for geographic and time series
+      function createEnhancedPlotlyChart(chartType, data) {
+        const plotlyDiv = document.getElementById("modalChart");
+
+        if (chartType === "geographic") {
+          // Create sophisticated choropleth world map with fraud data
+          const countryData = {
+            USA: { fraud_rate: 8.5, incidents: 15420, color: "#ff4757" },
+            CHN: { fraud_rate: 6.2, incidents: 12800, color: "#ff6b6b" },
+            GBR: { fraud_rate: 7.8, incidents: 8900, color: "#ff5722" },
+            DEU: { fraud_rate: 5.4, incidents: 6700, color: "#ff7043" },
+            FRA: { fraud_rate: 6.1, incidents: 5800, color: "#ff8a65" },
+            JPN: { fraud_rate: 4.2, incidents: 4200, color: "#ffab91" },
+            ITA: { fraud_rate: 5.9, incidents: 3900, color: "#ff8a65" },
+            BRA: { fraud_rate: 9.1, incidents: 7200, color: "#ff3d00" },
+            IND: { fraud_rate: 7.3, incidents: 9800, color: "#ff5722" },
+            CAN: { fraud_rate: 4.8, incidents: 2800, color: "#ff9800" },
+            AUS: { fraud_rate: 5.2, incidents: 2100, color: "#ffb74d" },
+            RUS: { fraud_rate: 8.9, incidents: 6500, color: "#ff4757" },
+            MEX: { fraud_rate: 7.6, incidents: 4300, color: "#ff5722" },
+            ESP: { fraud_rate: 5.7, incidents: 2900, color: "#ff8a65" },
+            NLD: { fraud_rate: 4.1, incidents: 1200, color: "#ffcc02" },
+          };
+
+          // Choropleth map data
+          const choroplethData = [
+            {
+              type: "choropleth",
+              locationmode: "ISO-3",
+              locations: Object.keys(countryData),
+              z: Object.values(countryData).map((d) => d.fraud_rate),
+              text: Object.entries(countryData).map(
+                ([country, data]) =>
+                  `${country}: ${
+                    data.fraud_rate
+                  }% fraud rate<br>${data.incidents.toLocaleString()} incidents`
+              ),
+              hovertemplate: "<b>%{text}</b><extra></extra>",
+              colorscale: [
+                [0, "#4ecdc4"],
+                [0.2, "#45b7d1"],
+                [0.4, "#96ceb4"],
+                [0.6, "#feca57"],
+                [0.8, "#ff9ff3"],
+                [1, "#ff6b6b"],
+              ],
+              colorbar: {
+                title: {
+                  text: "Fraud Rate (%)",
+                  font: { size: 16, color: "#2c3e50" },
+                },
+                tickfont: { size: 14, color: "#2c3e50" },
+                thickness: 20,
+                len: 0.8,
+              },
+              marker: {
+                line: {
+                  color: "rgba(255,255,255,0.8)",
+                  width: 1,
+                },
+              },
+            },
+          ];
+
+          // Add fraud hotspot markers
+          const hotspotData = {
+            type: "scattergeo",
+            mode: "markers",
+            lat: [
+              40.7128, 34.0522, 51.5074, 48.8566, 35.6762, -23.5505, 28.6139,
+              55.7558, 19.4326, 45.4642,
+            ],
+            lon: [
+              -74.006, -118.2437, -0.1278, 2.3522, 139.6503, -46.6333, 77.209,
+              37.6176, -99.1332, 9.19,
+            ],
+            marker: {
+              size: [25, 20, 18, 16, 15, 22, 19, 21, 17, 14],
+              color: [
+                "rgba(255, 71, 87, 0.8)",
+                "rgba(255, 107, 107, 0.8)",
+                "rgba(255, 87, 34, 0.8)",
+                "rgba(255, 112, 67, 0.8)",
+                "rgba(255, 171, 145, 0.8)",
+                "rgba(255, 61, 0, 0.8)",
+                "rgba(255, 87, 34, 0.8)",
+                "rgba(255, 71, 87, 0.8)",
+                "rgba(255, 87, 34, 0.8)",
+                "rgba(255, 138, 101, 0.8)",
+              ],
+              line: {
+                color: "rgba(255, 255, 255, 0.9)",
+                width: 3,
+              },
+              symbol: "circle",
+              sizemode: "diameter",
+            },
+            text: [
+              "New York: Financial Hub",
+              "Los Angeles: Tech Fraud",
+              "London: Banking Fraud",
+              "Paris: Card Fraud",
+              "Tokyo: Mobile Fraud",
+              "São Paulo: Online Fraud",
+              "New Delhi: Identity Theft",
+              "Moscow: Cyber Fraud",
+              "Mexico City: ATM Fraud",
+              "Milan: Luxury Fraud",
+            ],
+            hovertemplate:
+              "<b>%{text}</b><br>Major Fraud Hotspot<extra></extra>",
+            name: "Fraud Hotspots",
+          };
+
+          const geoLayout = {
+            title: {
+              text: "Global Fraud Distribution & Risk Analysis",
+              font: {
+                size: 26,
+                color: "#2c3e50",
+                family: "Inter, system-ui, sans-serif",
+              },
+              x: 0.5,
+              y: 0.95,
+            },
+            geo: {
+              projection: {
+                type: "natural earth",
+                scale: 1,
+              },
+              showland: true,
+              landcolor: "rgba(248, 250, 252, 0.8)",
+              showocean: true,
+              oceancolor: "rgba(230, 245, 255, 0.6)",
+              showlakes: true,
+              lakecolor: "rgba(230, 245, 255, 0.6)",
+              showrivers: false,
+              coastlinecolor: "rgba(99, 102, 241, 0.3)",
+              coastlinewidth: 1,
+              showframe: false,
+              showcoastlines: true,
+              bgcolor: "rgba(0,0,0,0)",
+            },
+            margin: { t: 60, r: 20, b: 20, l: 20 },
+            paper_bgcolor: "rgba(0,0,0,0)",
+            plot_bgcolor: "rgba(0,0,0,0)",
+            font: {
+              family: "Inter, system-ui, sans-serif",
+              color: "#2c3e50",
+            },
+          };
+
+          const config = {
+            responsive: true,
+            displayModeBar: true,
+            modeBarButtonsToRemove: [
+              "pan2d",
+              "lasso2d",
+              "select2d",
+              "autoScale2d",
+            ],
+            displaylogo: false,
+            toImageButtonOptions: {
+              format: "png",
+              filename: "fraud_distribution_map",
+              height: 600,
+              width: 1000,
+              scale: 2,
+            },
+          };
+
+          // Create the plot with both choropleth and scatter data
+          Plotly.newPlot(
+            plotlyDiv,
+            [choroplethData[0], hotspotData],
+            geoLayout,
+            config
+          ).then(() => {
+            // Add smooth animation
+            Plotly.animate(
+              plotlyDiv,
+              {
+                data: [choroplethData[0], hotspotData],
+                traces: [0, 1],
+                layout: geoLayout,
+              },
+              {
+                transition: { duration: 1000, easing: "cubic-in-out" },
+                frame: { duration: 1000, redraw: true },
+              }
+            );
+          });
+        } else if (chartType === "timeseries") {
+          // Enhanced multi-layered time series chart
+          const dates = Array.from(
+            { length: 90 },
+            (_, i) => new Date(Date.now() - (89 - i) * 24 * 60 * 60 * 1000)
+          );
+
+          // Generate realistic fraud detection data with trends
+          const fraudDetectionRate = dates.map((date, i) => {
+            const baseRate = 85 + Math.sin(i / 10) * 10;
+            const weeklyPattern = Math.sin(((i % 7) / 7) * Math.PI * 2) * 5;
+            const noise = (Math.random() - 0.5) * 8;
+            return Math.max(0, Math.min(100, baseRate + weeklyPattern + noise));
+          });
+
+          const transactionVolume = dates.map((date, i) => {
+            const baseVolume = 10000 + Math.sin(i / 15) * 3000;
+            const weeklyPattern = Math.sin(((i % 7) / 7) * Math.PI * 2) * 2000;
+            const noise = (Math.random() - 0.5) * 1000;
+            return Math.max(0, baseVolume + weeklyPattern + noise);
+          });
+
+          const anomalyScore = dates.map((date, i) => {
+            const baseScore = 20 + Math.sin(i / 8) * 15;
+            const spikes = Math.random() > 0.9 ? Math.random() * 40 : 0;
+            return Math.max(0, Math.min(100, baseScore + spikes));
+          });
+
+          const timeData = [
+            {
+              x: dates,
+              y: fraudDetectionRate,
+              type: "scatter",
+              mode: "lines+markers",
+              name: "Fraud Detection Rate",
+              line: {
+                color: "#6366f1",
+                width: 3,
+                shape: "spline",
+                smoothing: 0.3,
+              },
+              marker: {
+                size: 6,
+                color: "#8b5cf6",
+                line: { color: "#ffffff", width: 1 },
+              },
+              fill: "tonexty",
+              fillcolor: "rgba(99, 102, 241, 0.1)",
+              hovertemplate:
+                "<b>Detection Rate</b><br>%{y:.1f}%<br>%{x}<extra></extra>",
+            },
+            {
+              x: dates,
+              y: transactionVolume.map((v) => v / 200), // Scale for secondary axis
+              type: "scatter",
+              mode: "lines",
+              name: "Transaction Volume",
+              line: {
+                color: "#10b981",
+                width: 2,
+                dash: "dot",
+              },
+              yaxis: "y2",
+              hovertemplate:
+                "<b>Volume</b><br>%{customdata:,.0f} transactions<br>%{x}<extra></extra>",
+              customdata: transactionVolume,
+            },
+            {
+              x: dates,
+              y: anomalyScore,
+              type: "scatter",
+              mode: "markers",
+              name: "Anomaly Score",
+              marker: {
+                size: anomalyScore.map((s) => Math.max(4, s / 5)),
+                color: anomalyScore,
+                colorscale: [
+                  [0, "#4ecdc4"],
+                  [0.5, "#feca57"],
+                  [1, "#ff6b6b"],
+                ],
+                showscale: true,
+                colorbar: {
+                  title: "Risk Level",
+                  titleside: "right",
+                  tickmode: "array",
+                  tickvals: [0, 50, 100],
+                  ticktext: ["Low", "Medium", "High"],
+                  len: 0.3,
+                  y: 0.2,
+                },
+                line: { color: "#ffffff", width: 1 },
+                opacity: 0.8,
+              },
+              hovertemplate:
+                "<b>Anomaly Score</b><br>%{y:.0f}/100<br>%{x}<extra></extra>",
+            },
+          ];
+
+          const timeLayout = {
+            title: {
+              text: "Advanced Fraud Analytics Time Series",
+              font: {
+                size: 26,
+                color: "#2c3e50",
+                family: "Inter, system-ui, sans-serif",
+              },
+              x: 0.5,
+            },
+            xaxis: {
+              title: {
+                text: "Date",
+                font: { size: 16, color: "#2c3e50" },
+              },
+              tickfont: { size: 12, color: "#2c3e50" },
+              gridcolor: "rgba(99, 102, 241, 0.1)",
+              showgrid: true,
+              zeroline: false,
+            },
+            yaxis: {
+              title: {
+                text: "Detection Rate (%)",
+                font: { size: 16, color: "#2c3e50" },
+              },
+              tickfont: { size: 12, color: "#2c3e50" },
+              gridcolor: "rgba(99, 102, 241, 0.1)",
+              showgrid: true,
+              zeroline: false,
+              range: [0, 100],
+            },
+            yaxis2: {
+              title: {
+                text: "Transaction Volume (thousands)",
+                font: { size: 14, color: "#10b981" },
+              },
+              titlefont: { color: "#10b981" },
+              tickfont: { size: 12, color: "#10b981" },
+              overlaying: "y",
+              side: "right",
+              showgrid: false,
+              zeroline: false,
+            },
+            margin: { t: 80, r: 80, b: 60, l: 60 },
+            paper_bgcolor: "rgba(0,0,0,0)",
+            plot_bgcolor: "rgba(248, 250, 252, 0.3)",
+            font: {
+              family: "Inter, system-ui, sans-serif",
+              color: "#2c3e50",
+            },
+            legend: {
+              x: 0.02,
+              y: 0.98,
+              bgcolor: "rgba(255, 255, 255, 0.8)",
+              bordercolor: "rgba(99, 102, 241, 0.2)",
+              borderwidth: 1,
+            },
+            hovermode: "x unified",
+          };
+
+          const config = {
+            responsive: true,
+            displayModeBar: true,
+            modeBarButtonsToRemove: ["lasso2d", "select2d"],
+            displaylogo: false,
+            toImageButtonOptions: {
+              format: "png",
+              filename: "fraud_timeseries_analysis",
+              height: 600,
+              width: 1200,
+              scale: 2,
+            },
+          };
+
+          Plotly.newPlot(plotlyDiv, timeData, timeLayout, config).then(() => {
+            // Add smooth entrance animation
+            Plotly.animate(
+              plotlyDiv,
+              {
+                data: timeData,
+                layout: timeLayout,
+              },
+              {
+                transition: { duration: 1200, easing: "cubic-in-out" },
+                frame: { duration: 1200, redraw: true },
+              }
+            );
+          });
+        }
+      }
+
+      // Generic modal chart for fallback
+      function createGenericModalChart(ctx, chartType, data) {
+        const chartConfig = {
+          type: "line",
+          data: {
+            labels: Array.from({ length: 12 }, (_, i) => `Month ${i + 1}`),
+            datasets: [
+              {
+                label: "Fraud Detection Rate",
+                data: Array.from({ length: 12 }, () => Math.random() * 100),
+                borderColor: "#6366f1",
+                backgroundColor: "rgba(99, 102, 241, 0.1)",
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 6,
+                pointHoverRadius: 8,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            layout: {
+              padding: { top: 20, right: 30, bottom: 20, left: 30 },
+            },
+            plugins: {
+              title: {
+                display: true,
+                text: `Enhanced ${
+                  chartType.charAt(0).toUpperCase() + chartType.slice(1)
+                } Analysis`,
+                font: { size: 20, weight: "bold" },
+                padding: { bottom: 30 },
+              },
+              legend: {
+                position: "top",
+                labels: { boxWidth: 18, padding: 25, font: { size: 14 } },
+              },
+            },
+            scales: {
+              x: {
+                title: {
+                  display: true,
+                  text: "Time Period",
+                  font: { size: 14 },
+                },
+                ticks: { font: { size: 12 } },
+              },
+              y: {
+                title: {
+                  display: true,
+                  text: "Detection Rate (%)",
+                  font: { size: 14 },
+                },
+                ticks: { font: { size: 12 } },
+              },
+            },
+          },
+        };
+
+        new Chart(ctx, chartConfig);
+      }
+
+      // Enhanced anomaly detection chart
+      function createEnhancedAnomalyChart(ctx, data) {
+        const anomalyData = Array.from({ length: 24 }, (_, i) => ({
+          x: i,
+          y: Math.random() * 100,
+          isAnomaly: Math.random() > 0.8,
+        }));
+
+        new Chart(ctx, {
+          type: "scatter",
+          data: {
+            datasets: [
+              {
+                label: "Normal Transactions",
+                data: anomalyData.filter((d) => !d.isAnomaly),
+                backgroundColor: "#10b981",
+                borderColor: "#059669",
+                pointRadius: 6,
+                pointHoverRadius: 8,
+              },
+              {
+                label: "Anomalies Detected",
+                data: anomalyData.filter((d) => d.isAnomaly),
+                backgroundColor: "#ef4444",
+                borderColor: "#dc2626",
+                pointRadius: 10,
+                pointHoverRadius: 12,
+                pointStyle: "triangle",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            layout: { padding: { top: 30, right: 40, bottom: 30, left: 40 } },
+            plugins: {
+              title: {
+                display: true,
+                text: "Real-Time Anomaly Detection",
+                font: { size: 22, weight: "bold" },
+                padding: { bottom: 30 },
+              },
+              legend: {
+                position: "top",
+                labels: { boxWidth: 20, padding: 30, font: { size: 16 } },
+              },
+            },
+            scales: {
+              x: {
+                title: {
+                  display: true,
+                  text: "Time (Hours)",
+                  font: { size: 16 },
+                },
+                ticks: { font: { size: 14 } },
+              },
+              y: {
+                title: {
+                  display: true,
+                  text: "Transaction Score",
+                  font: { size: 16 },
+                },
+                ticks: { font: { size: 14 } },
+              },
+            },
+          },
+        });
+      }
+
+      // Enhanced model comparison chart
+      function createEnhancedModelChart(ctx, data) {
+        const models = [
+          "Random Forest",
+          "Neural Network",
+          "SVM",
+          "Gradient Boosting",
+          "Logistic Regression",
+        ];
+        const metrics = ["Accuracy", "Precision", "Recall", "F1-Score"];
+
+        new Chart(ctx, {
+          type: "radar",
+          data: {
+            labels: metrics,
+            datasets: models.map((model, index) => ({
+              label: model,
+              data: metrics.map(() => Math.random() * 0.3 + 0.7),
+              borderColor: `hsl(${index * 72}, 70%, 50%)`,
+              backgroundColor: `hsla(${index * 72}, 70%, 50%, 0.1)`,
+              borderWidth: 3,
+              pointRadius: 6,
+              pointHoverRadius: 8,
+            })),
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            layout: { padding: { top: 30, right: 40, bottom: 30, left: 40 } },
+            plugins: {
+              title: {
+                display: true,
+                text: "Model Performance Comparison",
+                font: { size: 22, weight: "bold" },
+                padding: { bottom: 30 },
+              },
+              legend: {
+                position: "top",
+                labels: { boxWidth: 20, padding: 20, font: { size: 14 } },
+              },
+            },
+            scales: {
+              r: {
+                beginAtZero: true,
+                max: 1,
+                ticks: {
+                  stepSize: 0.2,
+                  font: { size: 12 },
+                  callback: function (value) {
+                    return (value * 100).toFixed(0) + "%";
+                  },
+                },
+                pointLabels: {
+                  font: { size: 14, weight: "bold" },
+                },
+              },
+            },
+          },
+        });
+      }
+
+      function closeModal() {
+        const modal = document.getElementById("cardModal");
+        modal.classList.remove("active");
+        document.body.style.overflow = "";
+      }
+
+      // Modal footer action functions
+      function exportModalData() {
+        const modalTitle = document
+          .getElementById("modalTitle")
+          .textContent.trim();
+        console.log(`📥 Exporting data for: ${modalTitle}`);
+        showToast(`Exporting ${modalTitle} data...`, "success");
+
+        // Simulate export
+        setTimeout(() => {
+          showToast("Data exported successfully!", "success");
+        }, 1000);
+      }
+
+      function shareModal() {
+        const modalTitle = document
+          .getElementById("modalTitle")
+          .textContent.trim();
+        console.log(`🔗 Sharing: ${modalTitle}`);
+        showToast("Share link copied to clipboard!", "success");
+
+        // Copy share link to clipboard
+        const shareUrl = `${window.location.origin}${
+          window.location.pathname
+        }#${modalTitle.replace(/\s+/g, "-").toLowerCase()}`;
+        navigator.clipboard.writeText(shareUrl).catch(() => {
+          showToast("Could not copy to clipboard", "error");
+        });
+      }
+
+      function refreshModalData() {
+        const modalTitle = document
+          .getElementById("modalTitle")
+          .textContent.trim();
+        console.log(`🔄 Refreshing: ${modalTitle}`);
+        showToast("Refreshing data...", "info");
+
+        // Simulate refresh
+        const modalChartContainer = document.getElementById(
+          "modalChartContainer"
+        );
+        modalChartContainer.style.opacity = "0.5";
+
+        setTimeout(() => {
+          modalChartContainer.style.opacity = "1";
+          showToast("Data refreshed successfully!", "success");
+        }, 1000);
+      }
+
+      // Close modal on escape key
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") {
+          closeModal();
+        }
+      });
+
+      // Close modal when clicking overlay
+      document.addEventListener("click", function (e) {
+        if (e.target.classList.contains("modal-overlay")) {
+          closeModal();
+        }
+      });
+
+      // Toast notification function (if not already defined in advanced_analytics.js)
+      if (typeof showToast === "undefined") {
+        function showToast(message, type = "info") {
+          // Check if toast container exists, if not create it
+          let toastContainer = document.getElementById("toastContainer");
+          if (!toastContainer) {
+            toastContainer = document.createElement("div");
+            toastContainer.id = "toastContainer";
+            toastContainer.style.cssText = `
+              position: fixed;
+              top: 20px;
+              right: 20px;
+              z-index: 10000;
+              display: flex;
+              flex-direction: column;
+              gap: 10px;
+            `;
+            document.body.appendChild(toastContainer);
+          }
+
+          // Create toast element
+          const toast = document.createElement("div");
+          toast.className = `toast toast-${type}`;
+
+          // Set icon based on type
+          let icon = "fa-info-circle";
+          let bgColor = "#3b82f6";
+          if (type === "success") {
+            icon = "fa-check-circle";
+            bgColor = "#10b981";
+          } else if (type === "error") {
+            icon = "fa-exclamation-circle";
+            bgColor = "#ef4444";
+          } else if (type === "warning") {
+            icon = "fa-exclamation-triangle";
+            bgColor = "#f59e0b";
+          }
+
+          toast.style.cssText = `
+            background: ${bgColor};
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 250px;
+            max-width: 400px;
+            animation: slideIn 0.3s ease-out;
+            font-family: Inter, sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+          `;
+
+          toast.innerHTML = `
+            <i class="fas ${icon}"></i>
+            <span>${message}</span>
+          `;
+
+          toastContainer.appendChild(toast);
+
+          // Auto remove after 3 seconds
+          setTimeout(() => {
+            toast.style.animation = "slideOut 0.3s ease-in";
+            setTimeout(() => {
+              toast.remove();
+            }, 300);
+          }, 3000);
+        }
+      }
+    </script>
+
+    <!-- Enhanced Modal for Analytics -->
+    <div id="cardModal" class="modal-overlay">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title" id="modalTitle">
+            <i class="fas fa-chart-line"></i>
+            Chart Details
+          </div>
+          <button type="button" class="modal-close" onclick="closeModal()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-analytics-container">
+            <!-- Chart Section -->
+            <div class="modal-chart-section">
+              <div class="modal-chart-title" id="modalChartTitle">
+                <i class="fas fa-chart-area"></i>
+                Detailed Analysis
+              </div>
+              <div class="modal-chart-container" id="modalChartContainer">
+                <!-- Chart will be rendered here -->
+              </div>
+            </div>
+
+            <!-- Insights Section -->
+            <div class="modal-insights-section">
+              <!-- Key Metrics Card -->
+              <div class="modal-insights-card">
+                <div class="insights-card-title">
+                  <i class="fas fa-tachometer-alt"></i>
+                  Key Metrics
+                </div>
+                <div id="modalKeyMetrics">
+                  <!-- Metrics will be populated here -->
+                </div>
+              </div>
+
+              <!-- Trends Card -->
+              <div class="modal-insights-card">
+                <div class="insights-card-title">
+                  <i class="fas fa-trending-up"></i>
+                  Trends & Patterns
+                </div>
+                <div id="modalTrends">
+                  <!-- Trends will be populated here -->
+                </div>
+              </div>
+
+              <!-- AI Insights Card -->
+              <div class="ai-insights">
+                <div class="ai-insights-title">
+                  <i class="fas fa-brain"></i>
+                  AI-Powered Insights
+                </div>
+                <div id="modalAIInsights">
+                  <!-- AI insights will be populated here -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal Footer with Actions -->
+        <div class="modal-footer">
+          <div class="modal-footer-actions">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="exportModalData()"
+            >
+              <i class="fas fa-download"></i>
+              Export Data
+            </button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="shareModal()"
+            >
+              <i class="fas fa-share-alt"></i>
+              Share
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              onclick="refreshModalData()"
+            >
+              <i class="fas fa-sync-alt"></i>
+              Refresh
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

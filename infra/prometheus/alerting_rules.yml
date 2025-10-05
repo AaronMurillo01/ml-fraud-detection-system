@@ -1,0 +1,288 @@
+# Prometheus Alerting Rules for Fraud Detection System
+# These rules define alerts for various system conditions
+
+groups:
+  - name: fraud_detection_api
+    rules:
+      # High Error Rate Alert
+      - alert: HighErrorRate
+        expr: (
+          sum(rate(http_requests_total{status_code=~"5.."}[5m])) /
+          sum(rate(http_requests_total[5m]))
+        ) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+          service: fraud-detection-api
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value | humanizePercentage }} for the last 5 minutes"
+
+      # High Response Time Alert
+      - alert: HighResponseTime
+        expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le)) > 2.0
+        for: 3m
+        labels:
+          severity: warning
+          service: fraud-detection-api
+        annotations:
+          summary: "High response time detected"
+          description: "95th percentile response time is {{ $value }}s for the last 5 minutes"
+
+      # API Down Alert
+      - alert: APIDown
+        expr: up{job="fraud-detection-api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: fraud-detection-api
+        annotations:
+          summary: "Fraud Detection API is down"
+          description: "The Fraud Detection API has been down for more than 1 minute"
+
+      # High Request Rate Alert
+      - alert: HighRequestRate
+        expr: sum(rate(http_requests_total[5m])) > 1000
+        for: 5m
+        labels:
+          severity: warning
+          service: fraud-detection-api
+        annotations:
+          summary: "High request rate detected"
+          description: "Request rate is {{ $value }} requests/second for the last 5 minutes"
+
+  - name: fraud_detection_ml
+    rules:
+      # Model Inference Time Alert
+      - alert: SlowModelInference
+        expr: histogram_quantile(0.95, sum(rate(model_inference_duration_seconds_bucket[5m])) by (le)) > 1.0
+        for: 3m
+        labels:
+          severity: warning
+          service: fraud-detection-ml
+        annotations:
+          summary: "Slow model inference detected"
+          description: "95th percentile model inference time is {{ $value }}s"
+
+      # Model Prediction Rate Drop
+      - alert: LowPredictionRate
+        expr: rate(fraud_predictions_total[5m]) < 0.1
+        for: 5m
+        labels:
+          severity: warning
+          service: fraud-detection-ml
+        annotations:
+          summary: "Low fraud prediction rate"
+          description: "Fraud prediction rate has dropped to {{ $value }} predictions/second"
+
+      # Feature Processing Time Alert
+      - alert: SlowFeatureProcessing
+        expr: histogram_quantile(0.95, sum(rate(feature_processing_duration_seconds_bucket[5m])) by (le)) > 0.5
+        for: 3m
+        labels:
+          severity: warning
+          service: fraud-detection-ml
+        annotations:
+          summary: "Slow feature processing detected"
+          description: "95th percentile feature processing time is {{ $value }}s"
+
+  - name: fraud_detection_database
+    rules:
+      # Database Connection Alert
+      - alert: DatabaseDown
+        expr: up{job="postgres"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: fraud-detection-db
+        annotations:
+          summary: "Database is down"
+          description: "PostgreSQL database has been down for more than 1 minute"
+
+      # Slow Database Queries
+      - alert: SlowDatabaseQueries
+        expr: histogram_quantile(0.95, sum(rate(database_query_duration_seconds_bucket[5m])) by (le)) > 1.0
+        for: 3m
+        labels:
+          severity: warning
+          service: fraud-detection-db
+        annotations:
+          summary: "Slow database queries detected"
+          description: "95th percentile database query time is {{ $value }}s"
+
+      # High Database Error Rate
+      - alert: HighDatabaseErrorRate
+        expr: (
+          sum(rate(database_query_duration_seconds_count{status="error"}[5m])) /
+          sum(rate(database_query_duration_seconds_count[5m]))
+        ) > 0.05
+        for: 2m
+        labels:
+          severity: warning
+          service: fraud-detection-db
+        annotations:
+          summary: "High database error rate"
+          description: "Database error rate is {{ $value | humanizePercentage }}"
+
+  - name: fraud_detection_system
+    rules:
+      # High CPU Usage
+      - alert: HighCPUUsage
+        expr: 100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+          service: fraud-detection-system
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is {{ $value }}% on instance {{ $labels.instance }}"
+
+      # High Memory Usage
+      - alert: HighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+          service: fraud-detection-system
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is {{ $value }}% on instance {{ $labels.instance }}"
+
+      # Low Disk Space
+      - alert: LowDiskSpace
+        expr: (1 - (node_filesystem_avail_bytes{fstype!="tmpfs"} / node_filesystem_size_bytes{fstype!="tmpfs"})) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+          service: fraud-detection-system
+        annotations:
+          summary: "Low disk space detected"
+          description: "Disk usage is {{ $value }}% on {{ $labels.device }} ({{ $labels.instance }})"
+
+      # High Active Connections
+      - alert: HighActiveConnections
+        expr: active_connections > 100
+        for: 5m
+        labels:
+          severity: warning
+          service: fraud-detection-api
+        annotations:
+          summary: "High number of active connections"
+          description: "Active connections count is {{ $value }}"
+
+  - name: fraud_detection_business
+    rules:
+      # Fraud Detection Rate Anomaly
+      - alert: AnomalousFraudRate
+        expr: (
+          rate(fraud_predictions_total{result="fraud"}[1h]) /
+          rate(fraud_predictions_total[1h])
+        ) > 0.1 or (
+          rate(fraud_predictions_total{result="fraud"}[1h]) /
+          rate(fraud_predictions_total[1h])
+        ) < 0.001
+        for: 10m
+        labels:
+          severity: warning
+          service: fraud-detection-business
+        annotations:
+          summary: "Anomalous fraud detection rate"
+          description: "Fraud detection rate is {{ $value | humanizePercentage }}, which is outside normal range"
+
+      # Model Accuracy Drop (if we have feedback data)
+      - alert: ModelAccuracyDrop
+        expr: model_accuracy < 0.85
+        for: 15m
+        labels:
+          severity: critical
+          service: fraud-detection-ml
+        annotations:
+          summary: "Model accuracy has dropped"
+          description: "Model accuracy is {{ $value }}, below acceptable threshold"
+
+      # No Predictions Alert
+      - alert: NoPredictions
+        expr: increase(fraud_predictions_total[10m]) == 0
+        for: 10m
+        labels:
+          severity: critical
+          service: fraud-detection-ml
+        annotations:
+          summary: "No fraud predictions in the last 10 minutes"
+          description: "The fraud detection model hasn't made any predictions recently"
+
+  - name: fraud_detection_security
+    rules:
+      # High 4xx Error Rate (potential attacks)
+      - alert: HighClientErrorRate
+        expr: (
+          sum(rate(http_requests_total{status_code=~"4.."}[5m])) /
+          sum(rate(http_requests_total[5m]))
+        ) > 0.2
+        for: 5m
+        labels:
+          severity: warning
+          service: fraud-detection-security
+        annotations:
+          summary: "High client error rate detected"
+          description: "Client error rate is {{ $value | humanizePercentage }}, possible attack or misconfiguration"
+
+      # Suspicious Request Pattern
+      - alert: SuspiciousRequestPattern
+        expr: sum(rate(http_requests_total{status_code="401"}[5m])) > 10
+        for: 2m
+        labels:
+          severity: warning
+          service: fraud-detection-security
+        annotations:
+          summary: "High number of unauthorized requests"
+          description: "{{ $value }} unauthorized requests per second, possible brute force attack"
+
+      # Large Request Size
+      - alert: LargeRequestSize
+        expr: histogram_quantile(0.95, sum(rate(http_request_size_bytes_bucket[5m])) by (le)) > 1048576  # 1MB
+        for: 5m
+        labels:
+          severity: warning
+          service: fraud-detection-security
+        annotations:
+          summary: "Large request sizes detected"
+          description: "95th percentile request size is {{ $value | humanizeBytes }}"
+
+  - name: fraud_detection_availability
+    rules:
+      # Service Availability
+      - alert: LowServiceAvailability
+        expr: (
+          sum(rate(http_requests_total{status_code!~"5.."}[5m])) /
+          sum(rate(http_requests_total[5m]))
+        ) < 0.99
+        for: 5m
+        labels:
+          severity: critical
+          service: fraud-detection-availability
+        annotations:
+          summary: "Service availability is low"
+          description: "Service availability is {{ $value | humanizePercentage }} over the last 5 minutes"
+
+      # Health Check Failure
+      - alert: HealthCheckFailure
+        expr: up{job="fraud-detection-health"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          service: fraud-detection-health
+        annotations:
+          summary: "Health check is failing"
+          description: "Health check endpoint has been failing for more than 2 minutes"
+
+      # Readiness Check Failure
+      - alert: ReadinessCheckFailure
+        expr: probe_success{job="fraud-detection-readiness"} == 0
+        for: 3m
+        labels:
+          severity: warning
+          service: fraud-detection-health
+        annotations:
+          summary: "Readiness check is failing"
+          description: "Readiness check has been failing for more than 3 minutes"

@@ -1,0 +1,25 @@
+# Grafana Dashboard Provisioning Configuration
+# This file automatically loads dashboards from the specified directories
+
+apiVersion: 1
+
+providers:
+  - name: 'fraud-detection-dashboards'
+    orgId: 1
+    folder: 'Fraud Detection'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards
+      
+  - name: 'system-monitoring-dashboards'
+    orgId: 1
+    folder: 'System Monitoring'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards

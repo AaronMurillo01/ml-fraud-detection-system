@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FraudGuard AI - Advanced Fraud Detection</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --primary: #6366f1;
+        --primary-dark: #4f46e5;
+        --secondary: #8b5cf6;
+        --accent: #06b6d4;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --dark: #0f172a;
+        --light: #f8fafc;
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-400: #9ca3af;
+        --gray-500: #6b7280;
+        --gray-600: #4b5563;
+        --gray-700: #374151;
+        --gray-800: #1f2937;
+        --gray-900: #111827;
+        --white: #ffffff;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1),
+          0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1),
+          0 4px 6px -4px rgb(0 0 0 / 0.1);
+        --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1),
+          0 8px 10px -6px rgb(0 0 0 / 0.1);
+        --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        color: var(--gray-800);
+        overflow-x: hidden;
+      }
+
+      /* Animated Background */
+      .bg-animation {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      }
+
+      .bg-animation::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="10" r="0.5" fill="rgba(255,255,255,0.05)"/><circle cx="10" cy="50" r="0.5" fill="rgba(255,255,255,0.05)"/><circle cx="90" cy="30" r="0.5" fill="rgba(255,255,255,0.05)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+        animation: float 20s ease-in-out infinite;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px) rotate(0deg);
+        }
+        50% {
+          transform: translateY(-20px) rotate(1deg);
+        }
+      }
+
+      /* Header */
+      .header {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 1rem 0;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .nav {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 2rem;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: white;
+        font-weight: 700;
+        font-size: 1.5rem;
+        text-decoration: none;
+      }
+
+      .logo i {
+        font-size: 2rem;
+        background: linear-gradient(45deg, #fbbf24, #f59e0b);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      /* Navigation Links */
+      .nav-links {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+      }
+
+      .nav-link {
+        color: rgba(255, 255, 255, 0.9);
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .nav-link:hover {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        transform: translateY(-2px);
+      }
+
+      .nav-link.active {
+        background: rgba(255, 255, 255, 0.15);
+        color: white;
+      }
+
+      /* Theme Toggle */
+      .theme-toggle {
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: white;
+        font-size: 1.1rem;
+      }
+
+      .theme-toggle:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: scale(1.1) rotate(15deg);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      }
+
+      /* Mobile Menu Toggle */
+      .mobile-menu-toggle {
+        display: none;
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        border-radius: 8px;
+        padding: 0.5rem;
+        cursor: pointer;
+        color: white;
+        font-size: 1.5rem;
+      }
+
+      /* Main Container */
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+
+      /* Hero Section */
+      .hero {
+        text-align: center;
+        margin-bottom: 3rem;
+        animation: fadeInUp 0.8s ease-out;
+      }
+
+      .hero h1 {
+        font-size: 3.5rem;
+        font-weight: 800;
+        color: white;
+        margin-bottom: 1rem;
+        text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      }
+
+      .hero p {
+        font-size: 1.25rem;
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 2rem;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Main Content Grid */
+      .main-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 3rem;
+      }
+
+      @media (max-width: 768px) {
+        .nav-links {
+          position: fixed;
+          top: 70px;
+          right: -100%;
+          width: 250px;
+          height: calc(100vh - 70px);
+          background: rgba(15, 23, 42, 0.98);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          flex-direction: column;
+          padding: 1rem;
+          transition: all 0.3s ease;
+          z-index: 999;
+          box-shadow: -4px 0 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-links.active {
+          right: 0;
+        }
+
+        .nav-link span {
+          display: inline;
+        }
+
+        .mobile-menu-toggle {
+          display: block;
+        }
+
+        .main-grid {
+          grid-template-columns: 1fr;
+        }
+        .hero h1 {
+          font-size: 2.5rem;
+        }
+        .nav-links {
+          display: none;
+        }
+        .container {
+          padding: 1rem;
+        }
+      }
+
+      /* Card Styles */
+      .card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: var(--shadow-2xl);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        transition: all 0.3s ease;
+        animation: fadeInUp 0.8s ease-out;
+      }
+
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 32px 64px -12px rgba(0, 0, 0, 0.35);
+      }
+
+      .card h2 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--gray-800);
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .card h2 i {
+        font-size: 1.5rem;
+        color: var(--primary);
+      }
+
+      /* Form Styles */
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      .form-group label {
+        display: block;
+        font-weight: 600;
+        color: var(--gray-700);
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .form-input {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        border: 2px solid var(--gray-200);
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: var(--white);
+        color: var(--gray-800);
+      }
+
+      .form-input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        transform: translateY(-1px);
+      }
+
+      .form-select {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        border: 2px solid var(--gray-200);
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: var(--white);
+        color: var(--gray-800);
+        cursor: pointer;
+      }
+
+      .form-select:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+      }
+      /* Button Styles */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 1rem 2rem;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .btn-primary {
+        background: linear-gradient(
+          135deg,
+          var(--primary) 0%,
+          var(--primary-dark) 100%
+        );
+        color: white;
+        box-shadow: var(--shadow-lg);
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-xl);
+        background: linear-gradient(
+          135deg,
+          var(--primary-dark) 0%,
+          var(--primary) 100%
+        );
+      }
+
+      .btn-primary:active {
+        transform: translateY(0);
+      }
+
+      .btn-full {
+        width: 100%;
+      }
+
+      /* Results Section */
+      .results {
+        display: none;
+        animation: fadeInUp 0.5s ease-out;
+      }
+
+      .results.show {
+        display: block;
+      }
+
+      .result-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--gray-100);
+      }
+
+      .risk-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .risk-low {
+        background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+        color: white;
+      }
+
+      .risk-medium {
+        background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%);
+        color: white;
+      }
+
+      .risk-high {
+        background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+        color: white;
+      }
+
+      .metric {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 0;
+        border-bottom: 1px solid var(--gray-100);
+      }
+
+      .metric:last-child {
+        border-bottom: none;
+      }
+
+      .metric-label {
+        font-weight: 600;
+        color: var(--gray-700);
+      }
+
+      .metric-value {
+        font-weight: 700;
+        color: var(--gray-900);
+        font-size: 1.125rem;
+      }
+
+      /* Loading Spinner */
+      .loading {
+        text-align: center;
+        padding: 2rem;
+      }
+
+      .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid var(--gray-200);
+        border-top: 4px solid var(--primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Placeholder */
+      .placeholder {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: var(--gray-500);
+      }
+
+      .placeholder i {
+        font-size: 3rem;
+        color: var(--gray-300);
+        margin-bottom: 1rem;
+        display: block;
+      }
+
+      /* Stats Grid */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1rem;
+      }
+
+      .stat-item {
+        text-align: center;
+        padding: 1.5rem;
+        background: var(--gray-50);
+        border-radius: 12px;
+        border: 1px solid var(--gray-200);
+      }
+
+      .stat-value {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--primary);
+        margin-bottom: 0.5rem;
+      }
+
+      .stat-label {
+        font-size: 0.875rem;
+        color: var(--gray-600);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 600;
+      }
+
+      @media (max-width: 768px) {
+        .stats-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Animated Background -->
+    <div class="bg-animation"></div>
+
+    <!-- Header -->
+    <header class="header">
+      <nav class="nav">
+        <a href="/static/index.html" class="logo">
+          <i class="fas fa-shield-alt"></i>
+          <span>FraudGuard AI</span>
+        </a>
+        <button
+          type="button"
+          class="mobile-menu-toggle"
+          id="mobileMenuToggle"
+          aria-label="Toggle menu"
+        >
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="nav-links" id="navLinks">
+          <a href="/static/index.html" class="nav-link active">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+          </a>
+          <a href="/static/dashboard.html" class="nav-link">
+            <i class="fas fa-chart-pie"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="/static/analytics_dashboard.html" class="nav-link">
+            <i class="fas fa-chart-line"></i>
+            <span>Analytics</span>
+          </a>
+          <a href="/api/v1/models" class="nav-link">
+            <i class="fas fa-brain"></i>
+            <span>Models</span>
+          </a>
+          <a href="/health" class="nav-link">
+            <i class="fas fa-heartbeat"></i>
+            <span>Monitoring</span>
+          </a>
+          <a href="/docs" class="nav-link">
+            <i class="fas fa-book"></i>
+            <span>API Docs</span>
+          </a>
+          <button
+            type="button"
+            class="theme-toggle"
+            id="themeToggle"
+            aria-label="Toggle theme"
+            title="Toggle Dark/Light Mode"
+          >
+            <i class="fas fa-moon"></i>
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+      <!-- Hero Section -->
+      <section class="hero">
+        <h1>Advanced Fraud Detection</h1>
+        <p>
+          Protect your business with AI-powered fraud detection. Analyze
+          transactions in real-time with machine learning algorithms that adapt
+          to emerging fraud patterns.
+        </p>
+      </section>
+
+      <!-- Main Content Grid -->
+      <div class="main-grid">
+        <!-- Transaction Form -->
+        <div class="card">
+          <h2>
+            <i class="fas fa-credit-card"></i>
+            Analyze Transaction
+          </h2>
+
+          <form id="fraudForm">
+            <div class="form-group">
+              <label for="transactionId">Transaction ID</label>
+              <input
+                type="text"
+                id="transactionId"
+                name="transactionId"
+                class="form-input"
+                placeholder="txn_001"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="userId">User ID</label>
+              <input
+                type="text"
+                id="userId"
+                name="userId"
+                class="form-input"
+                placeholder="user_123"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="merchantId">Merchant ID</label>
+              <input
+                type="text"
+                id="merchantId"
+                name="merchantId"
+                class="form-input"
+                placeholder="merchant_456"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="amount">Amount ($)</label>
+              <input
+                type="number"
+                id="amount"
+                name="amount"
+                class="form-input"
+                placeholder="100.00"
+                step="0.01"
+                min="0"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="currency">Currency</label>
+              <select id="currency" name="currency" class="form-select">
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="GBP">GBP</option>
+                <option value="CAD">CAD</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="paymentMethod">Payment Method</label>
+              <select
+                id="paymentMethod"
+                name="paymentMethod"
+                class="form-select"
+              >
+                <option value="credit_card">Credit Card</option>
+                <option value="debit_card">Debit Card</option>
+                <option value="paypal">PayPal</option>
+                <option value="bank_transfer">Bank Transfer</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="ipAddress">IP Address (Optional)</label>
+              <input
+                type="text"
+                id="ipAddress"
+                name="ipAddress"
+                class="form-input"
+                placeholder="192.168.1.100"
+              />
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full">
+              <i class="fas fa-shield-alt"></i>
+              Analyze Transaction
+            </button>
+          </form>
+        </div>
+
+        <!-- Results Section -->
+        <div class="card">
+          <h2>
+            <i class="fas fa-chart-line"></i>
+            Analysis Results
+          </h2>
+
+          <div id="results" class="results">
+            <div class="result-header">
+              <h3>Transaction Risk Assessment</h3>
+              <span id="riskBadge" class="risk-badge risk-low">Low Risk</span>
+            </div>
+
+            <div class="metric">
+              <span class="metric-label">Fraud Probability</span>
+              <span class="metric-value" id="fraudProb">0.0%</span>
+            </div>
+
+            <div class="metric">
+              <span class="metric-label">Confidence Score</span>
+              <span class="metric-value" id="confidence">0.0%</span>
+            </div>
+
+            <div class="metric">
+              <span class="metric-label">Recommended Action</span>
+              <span class="metric-value" id="action">APPROVE</span>
+            </div>
+
+            <div class="metric">
+              <span class="metric-label">Processing Time</span>
+              <span class="metric-value" id="processingTime">0ms</span>
+            </div>
+
+            <div class="metric">
+              <span class="metric-label">Model Version</span>
+              <span class="metric-value" id="modelVersion">demo_v1.0</span>
+            </div>
+          </div>
+
+          <div id="loading" class="loading" style="display: none">
+            <div class="spinner"></div>
+            <p>Analyzing transaction...</p>
+          </div>
+
+          <div id="placeholder" class="placeholder">
+            <i class="fas fa-chart-bar"></i>
+            <p>Submit a transaction to see analysis results</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Section -->
+      <div class="card" style="margin-top: 2rem">
+        <h2>
+          <i class="fas fa-tachometer-alt"></i>
+          System Statistics
+        </h2>
+
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-value" id="totalPredictions">-</div>
+            <div class="stat-label">Total Predictions</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="fraudDetected">-</div>
+            <div class="stat-label">Fraud Detected</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="accuracy">-</div>
+            <div class="stat-label">Accuracy</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="avgResponseTime">-</div>
+            <div class="stat-label">Avg Response Time</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Load system stats on page load
+      document.addEventListener("DOMContentLoaded", function () {
+        loadSystemStats();
+        // Auto-generate transaction ID
+        document.getElementById("transactionId").value = "txn_" + Date.now();
+      });
+
+      // Form submission handler
+      document
+        .getElementById("fraudForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          // Show loading state
+          showLoading();
+
+          // Get form data
+          const formData = new FormData(this);
+          const transactionData = {
+            transaction_id: formData.get("transactionId"),
+            user_id: formData.get("userId"),
+            merchant_id: formData.get("merchantId"),
+            amount: parseFloat(formData.get("amount")),
+            currency: formData.get("currency"),
+            payment_method: formData.get("paymentMethod"),
+            ip_address: formData.get("ipAddress") || null,
+          };
+
+          try {
+            // Call the fraud detection API
+            const response = await fetch("/api/v1/fraud/predict", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(transactionData),
+            });
+
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            displayResults(result);
+          } catch (error) {
+            console.error("Error:", error);
+            showError("Failed to analyze transaction. Please try again.");
+          }
+        });
+
+      function showLoading() {
+        document.getElementById("placeholder").style.display = "none";
+        document.getElementById("results").style.display = "none";
+        document.getElementById("loading").style.display = "block";
+      }
+
+      function displayResults(result) {
+        // Hide loading and placeholder
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("placeholder").style.display = "none";
+
+        // Update result values
+        document.getElementById("fraudProb").textContent =
+          (result.fraud_probability * 100).toFixed(1) + "%";
+        document.getElementById("confidence").textContent =
+          (result.confidence_score * 100).toFixed(1) + "%";
+        document.getElementById("action").textContent =
+          result.recommended_action;
+        document.getElementById("processingTime").textContent =
+          result.processing_time_ms.toFixed(1) + "ms";
+        document.getElementById("modelVersion").textContent =
+          result.model_version;
+
+        // Update risk badge
+        const riskBadge = document.getElementById("riskBadge");
+        riskBadge.textContent = result.risk_level + " Risk";
+        riskBadge.className =
+          "risk-badge risk-" + result.risk_level.toLowerCase();
+
+        // Show results
+        document.getElementById("results").style.display = "block";
+      }
+
+      function showError(message) {
+        document.getElementById("loading").style.display = "none";
+        alert(message);
+      }
+
+      async function loadSystemStats() {
+        try {
+          const response = await fetch("/api/v1/stats");
+          if (response.ok) {
+            const stats = await response.json();
+            document.getElementById("totalPredictions").textContent =
+              stats.total_predictions.toLocaleString();
+            document.getElementById("fraudDetected").textContent =
+              stats.fraud_detected.toLocaleString();
+            document.getElementById("accuracy").textContent =
+              (stats.accuracy * 100).toFixed(1) + "%";
+            document.getElementById("avgResponseTime").textContent =
+              stats.avg_response_time_ms.toFixed(1) + "ms";
+          }
+        } catch (error) {
+          console.error("Failed to load stats:", error);
+        }
+      }
+
+      // Mobile Menu Toggle
+      const mobileMenuToggle = document.getElementById("mobileMenuToggle");
+      const navLinks = document.getElementById("navLinks");
+      if (mobileMenuToggle && navLinks) {
+        mobileMenuToggle.addEventListener("click", function () {
+          navLinks.classList.toggle("active");
+          const icon = mobileMenuToggle.querySelector("i");
+          if (icon) {
+            icon.className = navLinks.classList.contains("active")
+              ? "fas fa-times"
+              : "fas fa-bars";
+          }
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener("click", function (event) {
+          if (
+            !navLinks.contains(event.target) &&
+            !mobileMenuToggle.contains(event.target)
+          ) {
+            navLinks.classList.remove("active");
+            const icon = mobileMenuToggle.querySelector("i");
+            if (icon) {
+              icon.className = "fas fa-bars";
+            }
+          }
+        });
+      }
+
+      // Theme Toggle (placeholder for future implementation)
+      const themeToggle = document.getElementById("themeToggle");
+      if (themeToggle) {
+        themeToggle.addEventListener("click", function () {
+          // Theme toggle functionality can be added here
+          const icon = themeToggle.querySelector("i");
+          if (icon) {
+            icon.className =
+              icon.className === "fas fa-moon" ? "fas fa-sun" : "fas fa-moon";
+          }
+        });
+      }
+    </script>
+  </body>
+</html>

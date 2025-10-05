@@ -1,0 +1,232 @@
+# Fraud Detection System Alerting Rules
+groups:
+  - name: fraud_detection_api
+    rules:
+      # API Health and Availability
+      - alert: FraudAPIDown
+        expr: up{job="fraud-api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: fraud-api
+        annotations:
+          summary: "Fraud Detection API is down"
+          description: "The Fraud Detection API has been down for more than 1 minute."
+
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{job="fraud-api",status=~"5.."}[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+          service: fraud-api
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value }} errors per second for the last 5 minutes."
+
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job="fraud-api"}[5m])) > 0.05
+        for: 3m
+        labels:
+          severity: warning
+          service: fraud-api
+        annotations:
+          summary: "High API latency detected"
+          description: "95th percentile latency is {{ $value }}s, exceeding 50ms threshold."
+
+      - alert: CriticalLatency
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job="fraud-api"}[5m])) > 0.1
+        for: 1m
+        labels:
+          severity: critical
+          service: fraud-api
+        annotations:
+          summary: "Critical API latency detected"
+          description: "95th percentile latency is {{ $value }}s, exceeding 100ms critical threshold."
+
+  - name: fraud_detection_ml
+    rules:
+      # ML Model Performance
+      - alert: ModelPredictionLatency
+        expr: histogram_quantile(0.95, rate(model_prediction_duration_seconds_bucket[5m])) > 0.02
+        for: 2m
+        labels:
+          severity: warning
+          service: ml-model
+        annotations:
+          summary: "Model prediction latency is high"
+          description: "95th percentile model prediction time is {{ $value }}s, exceeding 20ms threshold."
+
+      - alert: ModelAccuracyDrop
+        expr: model_accuracy < 0.85
+        for: 5m
+        labels:
+          severity: critical
+          service: ml-model
+        annotations:
+          summary: "Model accuracy has dropped significantly"
+          description: "Model accuracy is {{ $value }}, below 85% threshold."
+
+      - alert: HighFraudRate
+        expr: rate(fraud_predictions_total{prediction="fraud"}[10m]) / rate(fraud_predictions_total[10m]) > 0.2
+        for: 5m
+        labels:
+          severity: warning
+          service: ml-model
+        annotations:
+          summary: "Unusually high fraud detection rate"
+          description: "Fraud detection rate is {{ $value | humanizePercentage }}, which may indicate model drift or attack."
+
+      - alert: LowFraudRate
+        expr: rate(fraud_predictions_total{prediction="fraud"}[10m]) / rate(fraud_predictions_total[10m]) < 0.001
+        for: 10m
+        labels:
+          severity: warning
+          service: ml-model
+        annotations:
+          summary: "Unusually low fraud detection rate"
+          description: "Fraud detection rate is {{ $value | humanizePercentage }}, which may indicate model issues."
+
+  - name: infrastructure
+    rules:
+      # Database Health
+      - alert: PostgreSQLDown
+        expr: up{job="postgres"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: database
+        annotations:
+          summary: "PostgreSQL database is down"
+          description: "PostgreSQL database has been down for more than 1 minute."
+
+      - alert: DatabaseConnectionsHigh
+        expr: pg_stat_database_numbackends / pg_settings_max_connections > 0.8
+        for: 2m
+        labels:
+          severity: warning
+          service: database
+        annotations:
+          summary: "High database connection usage"
+          description: "Database connection usage is {{ $value | humanizePercentage }}."
+
+      # Redis Health
+      - alert: RedisDown
+        expr: up{job="redis"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: cache
+        annotations:
+          summary: "Redis cache is down"
+          description: "Redis cache has been down for more than 1 minute."
+
+      - alert: RedisMemoryHigh
+        expr: redis_memory_used_bytes / redis_memory_max_bytes > 0.9
+        for: 2m
+        labels:
+          severity: warning
+          service: cache
+        annotations:
+          summary: "Redis memory usage is high"
+          description: "Redis memory usage is {{ $value | humanizePercentage }}."
+
+      # Kafka Health
+      - alert: KafkaDown
+        expr: up{job="kafka"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: messaging
+        annotations:
+          summary: "Kafka is down"
+          description: "Kafka has been down for more than 1 minute."
+
+      - alert: KafkaConsumerLag
+        expr: kafka_consumer_lag_sum > 1000
+        for: 5m
+        labels:
+          severity: warning
+          service: messaging
+        annotations:
+          summary: "High Kafka consumer lag"
+          description: "Kafka consumer lag is {{ $value }} messages."
+
+  - name: system_resources
+    rules:
+      # CPU Usage
+      - alert: HighCPUUsage
+        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 3m
+        labels:
+          severity: warning
+          service: system
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is {{ $value }}% on {{ $labels.instance }}."
+
+      # Memory Usage
+      - alert: HighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
+        for: 3m
+        labels:
+          severity: warning
+          service: system
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is {{ $value }}% on {{ $labels.instance }}."
+
+      # Disk Usage
+      - alert: HighDiskUsage
+        expr: (1 - (node_filesystem_avail_bytes{fstype!="tmpfs"} / node_filesystem_size_bytes{fstype!="tmpfs"})) * 100 > 85
+        for: 2m
+        labels:
+          severity: warning
+          service: system
+        annotations:
+          summary: "High disk usage detected"
+          description: "Disk usage is {{ $value }}% on {{ $labels.instance }} for {{ $labels.mountpoint }}."
+
+  - name: business_metrics
+    rules:
+      # Transaction Volume
+      - alert: LowTransactionVolume
+        expr: rate(transactions_processed_total[10m]) < 10
+        for: 5m
+        labels:
+          severity: warning
+          service: business
+        annotations:
+          summary: "Low transaction volume detected"
+          description: "Transaction processing rate is {{ $value }} transactions per second."
+
+      - alert: HighTransactionVolume
+        expr: rate(transactions_processed_total[5m]) > 1000
+        for: 2m
+        labels:
+          severity: warning
+          service: business
+        annotations:
+          summary: "High transaction volume detected"
+          description: "Transaction processing rate is {{ $value }} transactions per second."
+
+      # Feature Engineering
+      - alert: FeatureExtractionFailure
+        expr: rate(feature_extraction_errors_total[5m]) > 0.01
+        for: 2m
+        labels:
+          severity: warning
+          service: features
+        annotations:
+          summary: "High feature extraction error rate"
+          description: "Feature extraction error rate is {{ $value }} errors per second."
+
+      # Data Quality
+      - alert: DataQualityIssue
+        expr: rate(data_quality_violations_total[5m]) > 0.05
+        for: 3m
+        labels:
+          severity: warning
+          service: data-quality
+        annotations:
+          summary: "Data quality issues detected"
+          description: "Data quality violation rate is {{ $value }} violations per second."

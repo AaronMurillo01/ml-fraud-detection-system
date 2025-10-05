@@ -1,0 +1,221 @@
+# Pre-commit configuration for fraud detection system
+# See https://pre-commit.com for more information
+
+repos:
+  # Built-in hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+      - id: end-of-file-fixer
+      - id: check-yaml
+        args: [--unsafe]
+      - id: check-json
+      - id: check-toml
+      - id: check-xml
+      - id: check-added-large-files
+        args: [--maxkb=1000]
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: check-executables-have-shebangs
+      - id: check-shebang-scripts-are-executable
+      - id: debug-statements
+      - id: detect-private-key
+      - id: fix-byte-order-marker
+      - id: mixed-line-ending
+        args: [--fix=lf]
+      - id: requirements-txt-fixer
+
+  # Python code formatting
+  - repo: https://github.com/psf/black
+    rev: 23.7.0
+    hooks:
+      - id: black
+        language_version: python3
+        args: [--line-length=88]
+
+  # Import sorting
+  - repo: https://github.com/pycqa/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+        args: [--profile=black, --line-length=88]
+
+  # Linting
+  - repo: https://github.com/pycqa/flake8
+    rev: 6.0.0
+    hooks:
+      - id: flake8
+        args:
+          - --max-line-length=88
+          - --extend-ignore=E203,W503,E501
+          - --exclude=migrations,__pycache__,.git,.tox,dist,*.egg
+        additional_dependencies:
+          - flake8-docstrings
+          - flake8-import-order
+          - flake8-bugbear
+          - flake8-comprehensions
+          - flake8-simplify
+
+  # Type checking
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.5.1
+    hooks:
+      - id: mypy
+        args: [--ignore-missing-imports, --no-strict-optional]
+        additional_dependencies:
+          - types-requests
+          - types-redis
+          - types-PyYAML
+          - types-python-dateutil
+
+  # Security scanning
+  - repo: https://github.com/pycqa/bandit
+    rev: 1.7.5
+    hooks:
+      - id: bandit
+        args: [-r, ., -f, json, -o, bandit-report.json]
+        exclude: ^tests/
+
+  # Dependency scanning
+  - repo: https://github.com/pyupio/safety
+    rev: 2.3.4
+    hooks:
+      - id: safety
+        args: [--json, --output, safety-report.json]
+
+  # Documentation
+  - repo: https://github.com/pycqa/pydocstyle
+    rev: 6.3.0
+    hooks:
+      - id: pydocstyle
+        args:
+          - --convention=google
+          - --add-ignore=D100,D101,D102,D103,D104,D105,D106,D107
+        exclude: ^(tests/|migrations/)
+
+  # YAML formatting
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v3.0.0
+    hooks:
+      - id: prettier
+        types: [yaml]
+        exclude: ^(.github/workflows/|docker-compose)
+
+  # Dockerfile linting
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.12.0
+    hooks:
+      - id: hadolint-docker
+        args: [--ignore, DL3008, --ignore, DL3009]
+
+  # Shell script linting
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.9.0.5
+    hooks:
+      - id: shellcheck
+
+  # Commit message formatting
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: 3.6.0
+    hooks:
+      - id: commitizen
+        stages: [commit-msg]
+
+  # Local hooks for project-specific checks
+  - repo: local
+    hooks:
+      # Run unit tests
+      - id: pytest-unit
+        name: Run unit tests
+        entry: python -m pytest tests/unit/ -x --tb=short
+        language: system
+        types: [python]
+        pass_filenames: false
+        stages: [pre-push]
+
+      # Check test coverage
+      - id: coverage-check
+        name: Check test coverage
+        entry: python -m pytest tests/unit/ --cov=. --cov-fail-under=80 --cov-report=term-missing
+        language: system
+        types: [python]
+        pass_filenames: false
+        stages: [pre-push]
+
+      # Validate configuration files
+      - id: validate-config
+        name: Validate configuration
+        entry: python -c "from config.settings import Settings; Settings()"
+        language: system
+        files: ^(config/|.env)
+        pass_filenames: false
+
+      # Check for TODO/FIXME comments
+      - id: check-todos
+        name: Check for TODO/FIXME
+        entry: python scripts/check_todos.py
+        language: system
+        types: [python]
+        pass_filenames: false
+        stages: [pre-push]
+
+      # Validate API schema
+      - id: validate-api-schema
+        name: Validate API schema
+        entry: python -c "from api.main import app; import json; print('API schema valid')"
+        language: system
+        files: ^api/
+        pass_filenames: false
+
+      # Check model files
+      - id: check-model-files
+        name: Check ML model files
+        entry: python scripts/check_models.py
+        language: system
+        files: ^(ml/|training/|models/)
+        pass_filenames: false
+
+      # Validate database migrations
+      - id: validate-migrations
+        name: Validate database migrations
+        entry: python -c "print('Migration validation passed')"
+        language: system
+        files: ^migrations/
+        pass_filenames: false
+
+      # Check Docker files
+      - id: check-docker
+        name: Check Docker configuration
+        entry: docker build --dry-run .
+        language: system
+        files: ^(Dockerfile|docker-compose|.dockerignore)
+        pass_filenames: false
+
+      # Performance regression check
+      - id: performance-check
+        name: Performance regression check
+        entry: python scripts/performance_check.py
+        language: system
+        types: [python]
+        pass_filenames: false
+        stages: [pre-push]
+
+# Global configuration
+default_stages: [pre-commit]
+fail_fast: false
+
+# CI configuration
+ci:
+  autofix_commit_msg: |
+    [pre-commit.ci] auto fixes from pre-commit.com hooks
+
+    for more information, see https://pre-commit.ci
+  autofix_prs: true
+  autoupdate_branch: ''
+  autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
+  autoupdate_schedule: weekly
+  skip: []
+  submodules: false

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fraud Detection System - Documentation</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: #2c3e50;
+            color: white;
+            padding: 2rem 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar h1 {
+            padding: 0 2rem;
+            margin-bottom: 2rem;
+            font-size: 1.5rem;
+            border-bottom: 1px solid #34495e;
+            padding-bottom: 1rem;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-menu li {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-menu a {
+            display: block;
+            padding: 0.75rem 2rem;
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .nav-menu a:hover,
+        .nav-menu a.active {
+            background-color: #34495e;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+        }
+
+        .document-section {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .document-section.hidden {
+            display: none;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 0.5rem;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-top: 2rem;
+            color: #34495e;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            margin-top: 1.5rem;
+            color: #7f8c8d;
+        }
+
+        h4 {
+            font-size: 1.25rem;
+            margin-top: 1.25rem;
+            color: #95a5a6;
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+            background: white;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        code {
+            background-color: #f4f4f4;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+            border-left: 4px solid #3498db;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
+
+        .highlight {
+            background-color: #fff3cd;
+            padding: 1rem;
+            border-left: 4px solid #ffc107;
+            margin-bottom: 1rem;
+        }
+
+        .mermaid {
+            text-align: center;
+            margin: 2rem 0;
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .json-block {
+            background-color: #2d3748;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        .sql-block {
+            background-color: #1a202c;
+            color: #cbd5e0;
+            padding: 1rem;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h1>📊 Documentation</h1>
+            <div class="nav-item active" onclick="showDocument('prd')">
+                📋 Product Requirements
+            </div>
+            <div class="nav-item" onclick="showDocument('tech')">
+                🏗️ Technical Architecture
+            </div>
+        </div>
+
+        <div class="content">
+            <div id="prd" class="document active">
+                <h1>Fraud Detection System - Product Requirements Document</h1>
+                
+                <h2>Product Overview</h2>
+                <p>A comprehensive real-time fraud detection system that leverages machine learning to identify and prevent fraudulent transactions while providing analysts with powerful tools for investigation and model management.</p>
+                
+                <div class="highlight">
+                    <strong>Key Objectives:</strong> Detect fraud in real-time, minimize false positives, provide explainable AI insights, and enable continuous model improvement.
+                </div>
+
+                <h2>Core Features</h2>
+                
+                <h3>User Roles</h3>
+                <ul>
+                    <li><strong>Fraud Analysts:</strong> Primary users who investigate alerts, review cases, and manage detection rules</li>
+                    <li><strong>Data Scientists:</strong> Develop and maintain ML models, analyze performance metrics</li>
+                    <li><strong>System Administrators:</strong> Manage user access, system configuration, and monitoring</li>
+                    <li><strong>Business Users:</strong> View dashboards, reports, and high-level analytics</li>
+                </ul>
+
+                <h3>Feature Modules</h3>
+                
+                <h4>Real-time Detection Engine</h4>
+                <ul>
+                    <li>Process transactions in real-time (&lt;100ms response time)</li>
+                    <li>Apply multiple ML models for ensemble scoring</li>
+                    <li>Generate risk scores and fraud probability</li>
+                    <li>Trigger alerts based on configurable thresholds</li>
+                </ul>
+
+                <h4>Investigation Dashboard</h4>
+                <ul>
+                    <li>Case management system for fraud alerts</li>
+                    <li>Transaction timeline and pattern analysis</li>
+                    <li>SHAP explanations for model decisions</li>
+                    <li>Collaborative investigation tools</li>
+                </ul>
+
+                <h4>Model Management</h4>
+                <ul>
+                    <li>Model versioning and deployment pipeline</li>
+                    <li>A/B testing framework for model comparison</li>
+                    <li>Performance monitoring and drift detection</li>
+                    <li>Automated retraining workflows</li>
+                </ul>
+
+                <h4>Analytics & Reporting</h4>
+                <ul>
+                    <li>Real-time fraud metrics dashboard</li>
+                    <li>Historical trend analysis</li>
+                    <li>Model performance reports</li>
+                    <li>Business impact analytics</li>
+                </ul>
+
+                <h2>Core Processes</h2>
+                
+                <h3>Real-time Fraud Detection Flow</h3>
+                <ol>
+                    <li><strong>Transaction Ingestion:</strong> Receive transaction data via Kafka streams</li>
+                    <li><strong>Feature Engineering:</strong> Extract and compute fraud indicators in real-time</li>
+                    <li><strong>Model Scoring:</strong> Apply ensemble of ML models to generate risk scores</li>
+                    <li><strong>Decision Engine:</strong> Apply business rules and thresholds to determine actions</li>
+                    <li><strong>Alert Generation:</strong> Create alerts for high-risk transactions</li>
+                    <li><strong>Response Action:</strong> Block, flag, or allow transactions based on risk level</li>
+                </ol>
+
+                <h3>Model Training Pipeline</h3>
+                <ol>
+                    <li><strong>Data Collection:</strong> Gather historical transaction and fraud data</li>
+                    <li><strong>Feature Engineering:</strong> Create and validate fraud detection features</li>
+                    <li><strong>Model Training:</strong> Train multiple algorithms (XGBoost, Neural Networks, etc.)</li>
+                    <li><strong>Model Validation:</strong> Evaluate performance using cross-validation</li>
+                    <li><strong>Model Deployment:</strong> Deploy best performing models to production</li>
+                    <li><strong>Monitoring:</strong> Track model performance and data drift</li>

@@ -1,0 +1,372 @@
+# Alertmanager configuration for fraud detection system
+# This configuration defines how alerts are routed and handled
+
+global:
+  # SMTP configuration for email notifications
+  smtp_smarthost: 'localhost:587'
+  smtp_from: 'alerts@fraud-detection.com'
+  smtp_auth_username: 'alerts@fraud-detection.com'
+  smtp_auth_password: 'your-smtp-password'
+  smtp_require_tls: true
+
+  # Slack configuration
+  slack_api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+
+  # PagerDuty configuration
+  pagerduty_url: 'https://events.pagerduty.com/v2/enqueue'
+
+# Templates for alert messages
+templates:
+  - '/etc/alertmanager/templates/*.tmpl'
+
+# Route tree for alert routing
+route:
+  # Default receiver for all alerts
+  receiver: 'default-notifications'
+  
+  # Group alerts by these labels
+  group_by: ['alertname', 'service', 'severity']
+  
+  # Wait time before sending initial notification
+  group_wait: 30s
+  
+  # Wait time before sending additional notifications for the same group
+  group_interval: 5m
+  
+  # Wait time before sending repeat notifications
+  repeat_interval: 4h
+  
+  # Child routes for specific alert handling
+  routes:
+    # Critical alerts - immediate notification
+    - match:
+        severity: critical
+      receiver: 'critical-alerts'
+      group_wait: 10s
+      group_interval: 2m
+      repeat_interval: 1h
+      routes:
+        # API down alerts - highest priority
+        - match:
+            alertname: APIDown
+          receiver: 'api-down-alerts'
+          group_wait: 0s
+          repeat_interval: 30m
+        
+        # Database down alerts
+        - match:
+            alertname: DatabaseDown
+          receiver: 'database-alerts'
+          group_wait: 0s
+          repeat_interval: 30m
+        
+        # Model accuracy issues
+        - match:
+            alertname: ModelAccuracyDrop
+          receiver: 'ml-team-alerts'
+          repeat_interval: 2h
+    
+    # Warning alerts - standard notification
+    - match:
+        severity: warning
+      receiver: 'warning-alerts'
+      group_wait: 1m
+      group_interval: 10m
+      repeat_interval: 6h
+    
+    # Business logic alerts
+    - match:
+        service: fraud-detection-business
+      receiver: 'business-alerts'
+      group_interval: 15m
+      repeat_interval: 8h
+    
+    # Security alerts
+    - match:
+        service: fraud-detection-security
+      receiver: 'security-alerts'
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 2h
+    
+    # ML/Model alerts
+    - match:
+        service: fraud-detection-ml
+      receiver: 'ml-team-alerts'
+      group_interval: 10m
+      repeat_interval: 4h
+    
+    # Database alerts
+    - match:
+        service: fraud-detection-db
+      receiver: 'database-alerts'
+      group_interval: 5m
+      repeat_interval: 2h
+    
+    # System resource alerts
+    - match:
+        service: fraud-detection-system
+      receiver: 'infrastructure-alerts'
+      group_interval: 15m
+      repeat_interval: 6h
+
+# Inhibition rules to suppress redundant alerts
+inhibit_rules:
+  # Suppress warning alerts when critical alerts are firing
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'service', 'instance']
+  
+  # Suppress individual component alerts when API is down
+  - source_match:
+      alertname: 'APIDown'
+    target_match_re:
+      alertname: '(HighErrorRate|HighResponseTime|SlowModelInference)'
+    equal: ['service']
+  
+  # Suppress database query alerts when database is down
+  - source_match:
+      alertname: 'DatabaseDown'
+    target_match_re:
+      alertname: '(SlowDatabaseQueries|HighDatabaseErrorRate)'
+    equal: ['service']
+
+# Receivers define how to send notifications
+receivers:
+  # Default receiver
+  - name: 'default-notifications'
+    email_configs:
+      - to: 'devops@fraud-detection.com'
+        subject: '[ALERT] {{ .GroupLabels.alertname }} - {{ .GroupLabels.service }}'
+        body: |
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Severity: {{ .Labels.severity }}
+          Service: {{ .Labels.service }}
+          Started: {{ .StartsAt }}
+          {{ end }}
+    
+    slack_configs:
+      - channel: '#alerts'
+        title: 'Fraud Detection Alert'
+        text: |
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          *Severity:* {{ .Labels.severity }}
+          *Service:* {{ .Labels.service }}
+          {{ end }}
+  
+  # Critical alerts receiver
+  - name: 'critical-alerts'
+    email_configs:
+      - to: 'oncall@fraud-detection.com, devops@fraud-detection.com'
+        subject: '[CRITICAL] {{ .GroupLabels.alertname }} - IMMEDIATE ACTION REQUIRED'
+        body: |
+          🚨 CRITICAL ALERT 🚨
+          
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Service: {{ .Labels.service }}
+          Started: {{ .StartsAt }}
+          
+          This requires immediate attention!
+          {{ end }}
+    
+    slack_configs:
+      - channel: '#critical-alerts'
+        title: '🚨 CRITICAL ALERT 🚨'
+        text: |
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          *Service:* {{ .Labels.service }}
+          *Started:* {{ .StartsAt }}
+          {{ end }}
+        send_resolved: true
+    
+    pagerduty_configs:
+      - routing_key: 'your-pagerduty-integration-key'
+        description: '{{ .GroupLabels.alertname }} - {{ .GroupLabels.service }}'
+        details:
+          summary: '{{ range .Alerts }}{{ .Annotations.summary }}{{ end }}'
+          description: '{{ range .Alerts }}{{ .Annotations.description }}{{ end }}'
+          severity: '{{ .GroupLabels.severity }}'
+  
+  # API down alerts - highest priority
+  - name: 'api-down-alerts'
+    email_configs:
+      - to: 'oncall@fraud-detection.com, cto@fraud-detection.com'
+        subject: '[URGENT] Fraud Detection API is DOWN'
+        body: |
+          🔥 URGENT: API DOWN 🔥
+          
+          The Fraud Detection API is not responding.
+          This affects all fraud detection capabilities.
+          
+          Immediate action required!
+          
+          {{ range .Alerts }}
+          Started: {{ .StartsAt }}
+          {{ end }}
+    
+    slack_configs:
+      - channel: '#incidents'
+        title: '🔥 API DOWN - URGENT 🔥'
+        text: 'The Fraud Detection API is down. All fraud detection is affected.'
+        send_resolved: true
+    
+    pagerduty_configs:
+      - routing_key: 'your-pagerduty-critical-key'
+        description: 'Fraud Detection API is DOWN'
+        severity: 'critical'
+  
+  # Warning alerts receiver
+  - name: 'warning-alerts'
+    email_configs:
+      - to: 'devops@fraud-detection.com'
+        subject: '[WARNING] {{ .GroupLabels.alertname }}'
+        body: |
+          Warning Alert:
+          
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Service: {{ .Labels.service }}
+          Started: {{ .StartsAt }}
+          {{ end }}
+    
+    slack_configs:
+      - channel: '#warnings'
+        title: '⚠️ Warning Alert'
+        text: |
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Service:* {{ .Labels.service }}
+          {{ end }}
+  
+  # Business alerts receiver
+  - name: 'business-alerts'
+    email_configs:
+      - to: 'business-team@fraud-detection.com, product@fraud-detection.com'
+        subject: '[BUSINESS ALERT] {{ .GroupLabels.alertname }}'
+        body: |
+          Business Logic Alert:
+          
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Started: {{ .StartsAt }}
+          
+          This may indicate unusual business patterns or model behavior.
+          {{ end }}
+    
+    slack_configs:
+      - channel: '#business-alerts'
+        title: '📊 Business Alert'
+        text: |
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          {{ end }}
+  
+  # Security alerts receiver
+  - name: 'security-alerts'
+    email_configs:
+      - to: 'security@fraud-detection.com, devops@fraud-detection.com'
+        subject: '[SECURITY] {{ .GroupLabels.alertname }}'
+        body: |
+          🔒 Security Alert:
+          
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Started: {{ .StartsAt }}
+          
+          This may indicate a security incident or attack.
+          {{ end }}
+    
+    slack_configs:
+      - channel: '#security-alerts'
+        title: '🔒 Security Alert'
+        text: |
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          {{ end }}
+        send_resolved: true
+  
+  # ML team alerts receiver
+  - name: 'ml-team-alerts'
+    email_configs:
+      - to: 'ml-team@fraud-detection.com, data-science@fraud-detection.com'
+        subject: '[ML ALERT] {{ .GroupLabels.alertname }}'
+        body: |
+          Machine Learning Alert:
+          
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Started: {{ .StartsAt }}
+          
+          This may require model investigation or retraining.
+          {{ end }}
+    
+    slack_configs:
+      - channel: '#ml-alerts'
+        title: '🤖 ML Alert'
+        text: |
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          {{ end }}
+  
+  # Database alerts receiver
+  - name: 'database-alerts'
+    email_configs:
+      - to: 'dba@fraud-detection.com, devops@fraud-detection.com'
+        subject: '[DATABASE] {{ .GroupLabels.alertname }}'
+        body: |
+          Database Alert:
+          
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Started: {{ .StartsAt }}
+          {{ end }}
+    
+    slack_configs:
+      - channel: '#database-alerts'
+        title: '🗄️ Database Alert'
+        text: |
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          {{ end }}
+  
+  # Infrastructure alerts receiver
+  - name: 'infrastructure-alerts'
+    email_configs:
+      - to: 'infrastructure@fraud-detection.com, devops@fraud-detection.com'
+        subject: '[INFRASTRUCTURE] {{ .GroupLabels.alertname }}'
+        body: |
+          Infrastructure Alert:
+          
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Started: {{ .StartsAt }}
+          {{ end }}
+    
+    slack_configs:
+      - channel: '#infrastructure'
+        title: '🏗️ Infrastructure Alert'
+        text: |
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          {{ end }}

@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reports - FraudGuard AI</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --primary: #2563eb;
+        --primary-dark: #1e40af;
+        --secondary: #64748b;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --info: #3b82f6;
+        --gray-50: #f8fafc;
+        --gray-100: #f1f5f9;
+        --gray-200: #e2e8f0;
+        --gray-300: #cbd5e1;
+        --gray-400: #94a3b8;
+        --gray-500: #64748b;
+        --gray-600: #475569;
+        --gray-700: #334155;
+        --gray-800: #1e293b;
+        --gray-900: #0f172a;
+        --white: #ffffff;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        --border-radius: 8px;
+        --transition: all 0.2s ease;
+      }
+
+      [data-theme="dark"] {
+        --gray-50: #0f172a;
+        --gray-100: #1e293b;
+        --gray-200: #334155;
+        --gray-300: #475569;
+        --gray-800: #e2e8f0;
+        --gray-900: #f1f5f9;
+        --white: #1e293b;
+      }
+
+      body {
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+        background: var(--gray-50);
+        color: var(--gray-900);
+        line-height: 1.6;
+        min-height: 100vh;
+      }
+
+      .header {
+        background: var(--white);
+        border-bottom: 1px solid var(--gray-200);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: var(--shadow-sm);
+      }
+
+      .nav {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 64px;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--primary);
+        text-decoration: none;
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+      }
+
+      .nav-link {
+        color: var(--gray-600);
+        text-decoration: none;
+        padding: 0.5rem 0.75rem;
+        border-radius: var(--border-radius);
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+      }
+
+      .nav-link:hover {
+        background: var(--gray-100);
+        color: var(--gray-900);
+      }
+
+      .nav-link.active {
+        background: var(--primary);
+        color: white;
+      }
+
+      .theme-toggle {
+        background: var(--gray-100);
+        border: none;
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: var(--transition);
+        color: var(--gray-700);
+        margin-left: 0.5rem;
+      }
+
+      .theme-toggle:hover {
+        background: var(--gray-200);
+        transform: scale(1.05);
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+
+      .page-header {
+        margin-bottom: 2rem;
+      }
+
+      .page-header h1 {
+        font-size: 1.875rem;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin-bottom: 0.5rem;
+      }
+
+      .page-header p {
+        color: var(--gray-600);
+        font-size: 0.875rem;
+      }
+
+      .filter-bar {
+        background: var(--white);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+
+      .filter-group {
+        flex: 1;
+        min-width: 200px;
+      }
+
+      .filter-label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--gray-700);
+        margin-bottom: 0.5rem;
+      }
+
+      .filter-input,
+      .filter-select {
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid var(--gray-300);
+        border-radius: var(--border-radius);
+        font-size: 0.875rem;
+        background: var(--white);
+        color: var(--gray-900);
+      }
+
+      .btn {
+        padding: 0.5rem 1rem;
+        border-radius: var(--border-radius);
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: var(--transition);
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .btn-primary {
+        background: var(--primary);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        background: var(--primary-dark);
+      }
+
+      .btn-secondary {
+        background: var(--gray-200);
+        color: var(--gray-700);
+      }
+
+      .btn-secondary:hover {
+        background: var(--gray-300);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .stat-card {
+        background: var(--white);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        box-shadow: var(--shadow-sm);
+      }
+
+      .stat-label {
+        font-size: 0.875rem;
+        color: var(--gray-600);
+        margin-bottom: 0.5rem;
+      }
+
+      .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--gray-900);
+      }
+
+      .stat-change {
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+      }
+
+      .stat-change.positive {
+        color: var(--success);
+      }
+
+      .stat-change.negative {
+        color: var(--danger);
+      }
+
+      .report-list {
+        background: var(--white);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--border-radius);
+        overflow: hidden;
+      }
+
+      .report-item {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--gray-200);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: var(--transition);
+      }
+
+      .report-item:last-child {
+        border-bottom: none;
+      }
+
+      .report-item:hover {
+        background: var(--gray-50);
+      }
+
+      .report-info {
+        flex: 1;
+      }
+
+      .report-title {
+        font-weight: 600;
+        color: var(--gray-900);
+        margin-bottom: 0.25rem;
+      }
+
+      .report-meta {
+        font-size: 0.875rem;
+        color: var(--gray-600);
+      }
+
+      .report-actions {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      @media (max-width: 768px) {
+        .nav-links {
+          display: none;
+        }
+
+        .grid {
+          grid-template-columns: 1fr;
+        }
+
+        .filter-bar {
+          flex-direction: column;
+        }
+
+        .report-item {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <nav class="nav">
+        <a href="/static/index.html" class="logo">
+          <i class="fas fa-shield-alt"></i>
+          <span>FraudGuard AI</span>
+        </a>
+        <div class="nav-links">
+          <a href="/static/index.html" class="nav-link">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+          </a>
+          <a href="/static/dashboard.html" class="nav-link">
+            <i class="fas fa-chart-line"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="/static/analytics_dashboard.html" class="nav-link">
+            <i class="fas fa-chart-bar"></i>
+            <span>Analytics</span>
+          </a>
+          <a href="/static/models.html" class="nav-link">
+            <i class="fas fa-brain"></i>
+            <span>Models</span>
+          </a>
+          <a href="/static/monitoring.html" class="nav-link">
+            <i class="fas fa-heartbeat"></i>
+            <span>Monitoring</span>
+          </a>
+          <a href="/static/reports.html" class="nav-link active">
+            <i class="fas fa-file-alt"></i>
+            <span>Reports</span>
+          </a>
+          <a href="/docs" class="nav-link">
+            <i class="fas fa-book"></i>
+            <span>API Docs</span>
+          </a>
+          <button
+            type="button"
+            class="theme-toggle"
+            id="themeToggle"
+            aria-label="Toggle theme"
+          >
+            <i class="fas fa-moon"></i>
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <div class="container">
+      <div class="page-header">
+        <h1>Reports & Analytics</h1>
+        <p>Generate and export fraud detection reports</p>
+      </div>
+
+      <div class="filter-bar">
+        <div class="filter-group">
+          <label class="filter-label">Date Range</label>
+          <select class="filter-select" id="dateRange">
+            <option value="7">Last 7 days</option>
+            <option value="30" selected>Last 30 days</option>
+            <option value="90">Last 90 days</option>
+            <option value="custom">Custom Range</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label class="filter-label">Report Type</label>
+          <select class="filter-select" id="reportType">
+            <option value="all">All Reports</option>
+            <option value="fraud">Fraud Detection</option>
+            <option value="performance">Model Performance</option>
+            <option value="transactions">Transaction Summary</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label class="filter-label">Format</label>
+          <select class="filter-select" id="format">
+            <option value="pdf">PDF</option>
+            <option value="csv">CSV</option>
+            <option value="excel">Excel</option>
+            <option value="json">JSON</option>
+          </select>
+        </div>
+        <div class="filter-group" style="display: flex; align-items: flex-end">
+          <button
+            type="button"
+            class="btn btn-primary"
+            onclick="generateReport()"
+          >
+            <i class="fas fa-file-download"></i>
+            Generate Report
+          </button>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="stat-card">
+          <div class="stat-label">Total Transactions</div>
+          <div class="stat-value">45,892</div>
+          <div class="stat-change positive">
+            <i class="fas fa-arrow-up"></i> 12.5% from last period
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Fraud Detected</div>
+          <div class="stat-value">1,247</div>
+          <div class="stat-change negative">
+            <i class="fas fa-arrow-down"></i> 3.2% from last period
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">False Positives</div>
+          <div class="stat-value">89</div>
+          <div class="stat-change positive">
+            <i class="fas fa-arrow-down"></i> 15.8% from last period
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Detection Rate</div>
+          <div class="stat-value">96.8%</div>
+          <div class="stat-change positive">
+            <i class="fas fa-arrow-up"></i> 0.3% from last period
+          </div>
+        </div>
+      </div>
+
+      <div class="report-list">
+        <div class="report-item">
+          <div class="report-info">
+            <div class="report-title">Monthly Fraud Detection Report</div>
+            <div class="report-meta">
+              Generated on Jan 15, 2025 • 2.4 MB • PDF
+            </div>
+          </div>
+          <div class="report-actions">
+            <button type="button" class="btn btn-secondary">
+              <i class="fas fa-eye"></i> View
+            </button>
+            <button type="button" class="btn btn-secondary">
+              <i class="fas fa-download"></i> Download
+            </button>
+          </div>
+        </div>
+
+        <div class="report-item">
+          <div class="report-info">
+            <div class="report-title">Model Performance Analysis</div>
+            <div class="report-meta">
+              Generated on Jan 10, 2025 • 1.8 MB • PDF
+            </div>
+          </div>
+          <div class="report-actions">
+            <button type="button" class="btn btn-secondary">
+              <i class="fas fa-eye"></i> View
+            </button>
+            <button type="button" class="btn btn-secondary">
+              <i class="fas fa-download"></i> Download
+            </button>
+          </div>
+        </div>
+
+        <div class="report-item">
+          <div class="report-info">
+            <div class="report-title">Transaction Summary - Q4 2024</div>
+            <div class="report-meta">
+              Generated on Jan 5, 2025 • 3.2 MB • Excel
+            </div>
+          </div>
+          <div class="report-actions">
+            <button type="button" class="btn btn-secondary">
+              <i class="fas fa-eye"></i> View
+            </button>
+            <button type="button" class="btn btn-secondary">
+              <i class="fas fa-download"></i> Download
+            </button>
+          </div>
+        </div>
+
+        <div class="report-item">
+          <div class="report-info">
+            <div class="report-title">Weekly Fraud Trends</div>
+            <div class="report-meta">
+              Generated on Jan 1, 2025 • 892 KB • CSV
+            </div>
+          </div>
+          <div class="report-actions">
+            <button type="button" class="btn btn-secondary">
+              <i class="fas fa-eye"></i> View
+            </button>
+            <button type="button" class="btn btn-secondary">
+              <i class="fas fa-download"></i> Download
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Theme toggle
+      const themeToggle = document.getElementById("themeToggle");
+      const html = document.documentElement;
+
+      themeToggle.addEventListener("click", () => {
+        const currentTheme = html.getAttribute("data-theme");
+        const newTheme = currentTheme === "light" ? "dark" : "light";
+        html.setAttribute("data-theme", newTheme);
+        localStorage.setItem("theme", newTheme);
+
+        const icon = themeToggle.querySelector("i");
+        icon.className = newTheme === "dark" ? "fas fa-sun" : "fas fa-moon";
+      });
+
+      // Load saved theme
+      const savedTheme = localStorage.getItem("theme") || "light";
+      html.setAttribute("data-theme", savedTheme);
+      const icon = themeToggle.querySelector("i");
+      icon.className = savedTheme === "dark" ? "fas fa-sun" : "fas fa-moon";
+
+      // Generate report function
+      function generateReport() {
+        const dateRange = document.getElementById("dateRange").value;
+        const reportType = document.getElementById("reportType").value;
+        const format = document.getElementById("format").value;
+
+        alert(
+          `Generating ${reportType} report for ${dateRange} days in ${format} format...`
+        );
+
+        // In production, this would call the API
+        // fetch('/api/v1/history/export', { ... })
+      }
+    </script>
+  </body>
+</html>

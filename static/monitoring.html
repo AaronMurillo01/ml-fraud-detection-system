@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>System Monitoring - FraudGuard AI</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --primary: #2563eb;
+        --primary-dark: #1e40af;
+        --secondary: #64748b;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --info: #3b82f6;
+        --gray-50: #f8fafc;
+        --gray-100: #f1f5f9;
+        --gray-200: #e2e8f0;
+        --gray-300: #cbd5e1;
+        --gray-400: #94a3b8;
+        --gray-500: #64748b;
+        --gray-600: #475569;
+        --gray-700: #334155;
+        --gray-800: #1e293b;
+        --gray-900: #0f172a;
+        --white: #ffffff;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        --border-radius: 8px;
+        --transition: all 0.2s ease;
+      }
+
+      [data-theme="dark"] {
+        --gray-50: #0f172a;
+        --gray-100: #1e293b;
+        --gray-200: #334155;
+        --gray-300: #475569;
+        --gray-800: #e2e8f0;
+        --gray-900: #f1f5f9;
+        --white: #1e293b;
+      }
+
+      body {
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+        background: var(--gray-50);
+        color: var(--gray-900);
+        line-height: 1.6;
+        min-height: 100vh;
+      }
+
+      .header {
+        background: var(--white);
+        border-bottom: 1px solid var(--gray-200);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: var(--shadow-sm);
+      }
+
+      .nav {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 64px;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--primary);
+        text-decoration: none;
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+      }
+
+      .nav-link {
+        color: var(--gray-600);
+        text-decoration: none;
+        padding: 0.5rem 0.75rem;
+        border-radius: var(--border-radius);
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+      }
+
+      .nav-link:hover {
+        background: var(--gray-100);
+        color: var(--gray-900);
+      }
+
+      .nav-link.active {
+        background: var(--primary);
+        color: white;
+      }
+
+      .theme-toggle {
+        background: var(--gray-100);
+        border: none;
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: var(--transition);
+        color: var(--gray-700);
+        margin-left: 0.5rem;
+      }
+
+      .theme-toggle:hover {
+        background: var(--gray-200);
+        transform: scale(1.05);
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+
+      .page-header {
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .page-header h1 {
+        font-size: 1.875rem;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin-bottom: 0.5rem;
+      }
+
+      .status-indicator {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: var(--white);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--border-radius);
+      }
+
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--success);
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .card {
+        background: var(--white);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        box-shadow: var(--shadow-sm);
+      }
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+
+      .card-title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--gray-600);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .card-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin-bottom: 0.5rem;
+      }
+
+      .card-label {
+        font-size: 0.875rem;
+        color: var(--gray-600);
+      }
+
+      .progress-bar {
+        width: 100%;
+        height: 8px;
+        background: var(--gray-200);
+        border-radius: 9999px;
+        overflow: hidden;
+        margin-top: 0.5rem;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: var(--primary);
+        transition: width 0.3s ease;
+      }
+
+      .progress-fill.success {
+        background: var(--success);
+      }
+
+      .progress-fill.warning {
+        background: var(--warning);
+      }
+
+      .progress-fill.danger {
+        background: var(--danger);
+      }
+
+      .metric-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+      }
+
+      .metric-item {
+        padding: 1rem;
+        background: var(--gray-50);
+        border-radius: var(--border-radius);
+      }
+
+      .metric-item-label {
+        font-size: 0.75rem;
+        color: var(--gray-600);
+        margin-bottom: 0.25rem;
+      }
+
+      .metric-item-value {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--gray-900);
+      }
+
+      .alert-list {
+        background: var(--white);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--border-radius);
+        overflow: hidden;
+      }
+
+      .alert-item {
+        padding: 1rem;
+        border-bottom: 1px solid var(--gray-200);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .alert-item:last-child {
+        border-bottom: none;
+      }
+
+      .alert-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .alert-icon.success {
+        background: #d1fae5;
+        color: #065f46;
+      }
+
+      .alert-icon.warning {
+        background: #fef3c7;
+        color: #92400e;
+      }
+
+      .alert-icon.danger {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+
+      .alert-content {
+        flex: 1;
+      }
+
+      .alert-title {
+        font-weight: 600;
+        color: var(--gray-900);
+        margin-bottom: 0.25rem;
+      }
+
+      .alert-time {
+        font-size: 0.75rem;
+        color: var(--gray-600);
+      }
+
+      @media (max-width: 768px) {
+        .nav-links {
+          display: none;
+        }
+
+        .grid {
+          grid-template-columns: 1fr;
+        }
+
+        .metric-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <nav class="nav">
+        <a href="/static/index.html" class="logo">
+          <i class="fas fa-shield-alt"></i>
+          <span>FraudGuard AI</span>
+        </a>
+        <div class="nav-links">
+          <a href="/static/index.html" class="nav-link">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+          </a>
+          <a href="/static/dashboard.html" class="nav-link">
+            <i class="fas fa-chart-line"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="/static/analytics_dashboard.html" class="nav-link">
+            <i class="fas fa-chart-bar"></i>
+            <span>Analytics</span>
+          </a>
+          <a href="/static/models.html" class="nav-link">
+            <i class="fas fa-brain"></i>
+            <span>Models</span>
+          </a>
+          <a href="/static/monitoring.html" class="nav-link active">
+            <i class="fas fa-heartbeat"></i>
+            <span>Monitoring</span>
+          </a>
+          <a href="/static/reports.html" class="nav-link">
+            <i class="fas fa-file-alt"></i>
+            <span>Reports</span>
+          </a>
+          <a href="/docs" class="nav-link">
+            <i class="fas fa-book"></i>
+            <span>API Docs</span>
+          </a>
+          <button
+            type="button"
+            class="theme-toggle"
+            id="themeToggle"
+            aria-label="Toggle theme"
+          >
+            <i class="fas fa-moon"></i>
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <div class="container">
+      <div class="page-header">
+        <div>
+          <h1>System Monitoring</h1>
+          <p style="color: var(--gray-600); font-size: 0.875rem">
+            Real-time system health and performance metrics
+          </p>
+        </div>
+        <div class="status-indicator">
+          <span class="status-dot"></span>
+          <span style="font-size: 0.875rem; font-weight: 500"
+            >All Systems Operational</span
+          >
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">CPU Usage</span>
+            <i class="fas fa-microchip" style="color: var(--primary)"></i>
+          </div>
+          <div class="card-value" id="cpuUsage">34%</div>
+          <div class="card-label">Average across all cores</div>
+          <div class="progress-bar">
+            <div class="progress-fill success" style="width: 34%"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Memory Usage</span>
+            <i class="fas fa-memory" style="color: var(--info)"></i>
+          </div>
+          <div class="card-value" id="memoryUsage">2.1 GB</div>
+          <div class="card-label">of 8 GB available</div>
+          <div class="progress-bar">
+            <div class="progress-fill success" style="width: 26%"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">API Response Time</span>
+            <i class="fas fa-clock" style="color: var(--success)"></i>
+          </div>
+          <div class="card-value" id="responseTime">45ms</div>
+          <div class="card-label">Average response time</div>
+          <div class="progress-bar">
+            <div class="progress-fill success" style="width: 15%"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">System Uptime</span>
+            <i class="fas fa-server" style="color: var(--warning)"></i>
+          </div>
+          <div class="card-value" id="uptime">15d 4h</div>
+          <div class="card-label">Since last restart</div>
+        </div>
+      </div>
+
+      <div class="grid" style="grid-template-columns: 2fr 1fr">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Service Health</span>
+          </div>
+          <div class="metric-grid">
+            <div class="metric-item">
+              <div class="metric-item-label">API Service</div>
+              <div class="metric-item-value" style="color: var(--success)">
+                <i class="fas fa-check-circle"></i> Healthy
+              </div>
+            </div>
+            <div class="metric-item">
+              <div class="metric-item-label">Database</div>
+              <div class="metric-item-value" style="color: var(--success)">
+                <i class="fas fa-check-circle"></i> Healthy
+              </div>
+            </div>
+            <div class="metric-item">
+              <div class="metric-item-label">Cache (Redis)</div>
+              <div class="metric-item-value" style="color: var(--warning)">
+                <i class="fas fa-exclamation-triangle"></i> Degraded
+              </div>
+            </div>
+            <div class="metric-item">
+              <div class="metric-item-label">ML Service</div>
+              <div class="metric-item-value" style="color: var(--success)">
+                <i class="fas fa-check-circle"></i> Healthy
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Request Stats</span>
+          </div>
+          <div style="margin-top: 1rem">
+            <div class="metric-item" style="margin-bottom: 0.5rem">
+              <div class="metric-item-label">Requests/min</div>
+              <div class="metric-item-value">1,247</div>
+            </div>
+            <div class="metric-item" style="margin-bottom: 0.5rem">
+              <div class="metric-item-label">Success Rate</div>
+              <div class="metric-item-value">99.8%</div>
+            </div>
+            <div class="metric-item">
+              <div class="metric-item-label">Error Rate</div>
+              <div class="metric-item-value">0.2%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Recent Alerts</span>
+        </div>
+        <div class="alert-list">
+          <div class="alert-item">
+            <div class="alert-icon success">
+              <i class="fas fa-check"></i>
+            </div>
+            <div class="alert-content">
+              <div class="alert-title">System Health Check Passed</div>
+              <div class="alert-time">2 minutes ago</div>
+            </div>
+          </div>
+          <div class="alert-item">
+            <div class="alert-icon warning">
+              <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="alert-content">
+              <div class="alert-title">Redis Cache Connection Slow</div>
+              <div class="alert-time">15 minutes ago</div>
+            </div>
+          </div>
+          <div class="alert-item">
+            <div class="alert-icon success">
+              <i class="fas fa-check"></i>
+            </div>
+            <div class="alert-content">
+              <div class="alert-title">Model Deployment Successful</div>
+              <div class="alert-time">1 hour ago</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Theme toggle
+      const themeToggle = document.getElementById("themeToggle");
+      const html = document.documentElement;
+
+      themeToggle.addEventListener("click", () => {
+        const currentTheme = html.getAttribute("data-theme");
+        const newTheme = currentTheme === "light" ? "dark" : "light";
+        html.setAttribute("data-theme", newTheme);
+        localStorage.setItem("theme", newTheme);
+
+        const icon = themeToggle.querySelector("i");
+        icon.className = newTheme === "dark" ? "fas fa-sun" : "fas fa-moon";
+      });
+
+      // Load saved theme
+      const savedTheme = localStorage.getItem("theme") || "light";
+      html.setAttribute("data-theme", savedTheme);
+      const icon = themeToggle.querySelector("i");
+      icon.className = savedTheme === "dark" ? "fas fa-sun" : "fas fa-moon";
+
+      // Load health data
+      async function loadHealthData() {
+        try {
+          const response = await fetch("/health");
+          if (response.ok) {
+            const data = await response.json();
+            console.log("Health data:", data);
+          }
+        } catch (error) {
+          console.error("Failed to load health data:", error);
+        }
+      }
+
+      loadHealthData();
+      setInterval(loadHealthData, 30000); // Refresh every 30 seconds
+    </script>
+  </body>
+</html>
