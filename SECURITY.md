@@ -20,7 +20,7 @@ We take the security of FraudGuard AI seriously. If you believe you have found a
 
 ### Please DO:
 
-1. Email us directly at: [Your security email]
+1. Email us directly at: Murillo.aaron01@gmail.com
 2. Provide detailed information including:
    - Description of the vulnerability
    - Steps to reproduce the issue
